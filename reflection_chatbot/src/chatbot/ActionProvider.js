@@ -1,3 +1,6 @@
+import Contexts from "./BotContext";
+//import GPT from "./GPTController"
+
 // ActionProvider code
 class ActionProvider {
   constructor(
@@ -16,7 +19,7 @@ class ActionProvider {
 
     this.apiAttemptLimit = 5;
 
-    // initiate gpt chatbot
+    // move to initial config, update msgLog in state or it will get overwritten
     this.msgLog = [
       {
         role: "system",
@@ -33,58 +36,60 @@ class ActionProvider {
       },
     ];
 
+    this.context = Contexts.Start;
+
     // check for API key
-    //this.clearApiKey();
+    //this.clearApiKey(); // for testing API key get
     this.getApiKey();
+
+    //console.log("Calling ActionProvider constructor");
   }
 
-  getApiKey() {
-    console.log(`getting API key`);
-    this.apiKey = localStorage.getItem("OPENAI_KEY");
+  handleStart = async (userMsg) => {
+    // decide which category user message belongs to
+    // get feedback or add to design journal
+    // update the bot context depending on the category
+    // deliver a response
+    this.postChatResponse("let's get started");
+    this.updateBotContext(Contexts.FeedbackStakeholders);
+  };
 
-    while (!this.apiKey) {
-      this.apiKey = window.prompt(`Please enter a valid key for OPENAI`);
-      console.log(`got API key ${this.apiKey}`);
-      if (this.apiKey && this.apiKey !== " ") {
-        localStorage.setItem("OPENAI_KEY", this.apiKey);
-      }
-    }
-  }
+  say = (botMsg = "hello world") => {
+    this.sendBotMessage(botMsg);
+  };
 
-  clearApiKey() {
-    console.log(`clearing stored API key`);
-    localStorage.clear();
-  }
+  updateBotContext = (newContext) => {
+    this.setState((prev) => ({
+      ...prev,
+      context: newContext,
+    }));
+  };
 
-  async generateSentence(userMsg) {
-    // add most recent message to message log
-    this.msgLog.push({ role: "user", content: userMsg });
+  sendBotMessage = (msg) => {
+    // post response to chat interface
+    const botMessage = this.createChatBotMessage(msg);
+    this.setState((prev) => ({
+      ...prev,
+      messages: [...prev.messages, botMessage],
+    }));
+  };
 
+  // TODO remove this and put in a separate js file that handles GPT commands
+  getGPTResponse = async (msgLog) => {
     // make request of gpt
     // if there is an error (hopefully because of api key issue) will get stuck in a loop
     let resp;
     let attempts = 0;
     while (!resp && attempts < this.apiAttemptLimit) {
-      resp = await this.gptRequest();
+      resp = await this.sendGPTRequest(msgLog);
       attempts++;
     }
     // TODO at attempt limit, display error message and pause chatbot
 
-    // post response to chat interface
-    if (resp) {
-      this.msgLog.push(resp.choices[0].message);
+    if (resp) return resp;
+  };
 
-      const botMessage = this.createChatBotMessage(
-        resp.choices[0].message.content
-      );
-      this.setState((prev) => ({
-        ...prev,
-        messages: [...prev.messages, botMessage],
-      }));
-    }
-  }
-
-  async gptRequest() {
+  sendGPTRequest = async (msgLog) => {
     const options = {
       method: "POST",
       headers: {
@@ -93,8 +98,8 @@ class ActionProvider {
       },
     };
     options.body = JSON.stringify({
-      model: "gpt-3.5-turbo",
-      messages: this.msgLog,
+      model: "gpt-3.5-turbo", // chatgpt api
+      messages: msgLog,
       temperature: 0.7,
       max_tokens: 96,
       top_p: 1,
@@ -126,7 +131,25 @@ class ActionProvider {
       console.log("There was an error fetching suggested sentences");
       console.log(e);
     }
-  }
+  };
+
+  getApiKey = () => {
+    //console.log(`ActionProvider getting API key`);
+    this.apiKey = localStorage.getItem("OPENAI_KEY");
+
+    while (!this.apiKey) {
+      this.apiKey = window.prompt(`Please enter a valid key for OPENAI`);
+      console.log(`got API key ${this.apiKey}`);
+      if (this.apiKey && this.apiKey !== " ") {
+        localStorage.setItem("OPENAI_KEY", this.apiKey);
+      }
+    }
+  };
+
+  clearApiKey = () => {
+    console.log(`clearing stored API key`);
+    localStorage.clear();
+  };
 }
 
 export default ActionProvider;

@@ -1,25 +1,11 @@
-//import BotContext from "./BotContext";
-//import GPT from "./GPTController"
-
-class MessageParser {
-  constructor(actionProvider, state) {
-    this.actionProvider = actionProvider;
-    this.state = state;
+class GPTController {
+  constructor(state) {
+    this.state = {
+      apiKey: this.getApiKey(),
+      ...state,
+    };
   }
 
-  parse(userMsg) {
-    //console.log(`message parser ${userMsg}`); // for testing message parser
-    console.log(
-      `Action Provider context: ${this.actionProvider.context.description}`
-    );
-    if (!this.actionProvider.context) {
-      console.log("Start state");
-    } else {
-      this.actionProvider.handleStart(userMsg);
-    }
-  }
-
-  // TODO remove this and put in a separate js file that handles GPT commands
   async getResponse(msgLog) {
     // make request of gpt
     // if there is an error (hopefully because of api key issue) will get stuck in a loop
@@ -97,7 +83,6 @@ class MessageParser {
     console.log(`clearing stored API key`);
     localStorage.clear();
   }
-  
 }
 
-export default MessageParser;
+export default GPTController;
