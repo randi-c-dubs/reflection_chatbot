@@ -1,8 +1,8 @@
 import React from "react";
 
-import "./Options.css";
+import "./GenericOptionsMenu.css";
 
-const Options = ({ options }) => {
+const GenericOptionsMenu = ({ options }) => {
   const buttonsMarkup = options.map((option) => (
     <button
       key={option.opId}
@@ -16,4 +16,4 @@ const Options = ({ options }) => {
   return <div className="options-container">{buttonsMarkup}</div>;
 };
 
-export default Options;
+export default GenericOptionsMenu;
