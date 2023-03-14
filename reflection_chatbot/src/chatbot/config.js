@@ -1,7 +1,9 @@
 import React from "react";
 import { createChatBotMessage } from "react-chatbot-kit";
 
-import StartMenuOptions from "./components/StartMenuOptions.jsx";
+import StartMenu from "./components/OptionsMenus/StartMenu.jsx";
+import HelpMenu from "./components/OptionsMenus/HelpMenu.jsx";
+import DesignJournalMenu from "./components/OptionsMenus/DesignJournalMenu.jsx";
 
 const botName = "Reflection Chatbot";
 
@@ -19,7 +21,15 @@ const config = {
   widgets: [
     {
       widgetName: "startMenu",
-      widgetFunc: (props) => <StartMenuOptions {...props} />,
+      widgetFunc: (props) => <StartMenu {...props} />,
+    },
+    {
+      widgetName: "designJournalMenu",
+      widgetFunc: (props) => <DesignJournalMenu {...props} />,
+    },
+    {
+      widgetName: "helpMenu",
+      widgetFunc: (props) => <HelpMenu {...props} />,
     },
   ],
 };

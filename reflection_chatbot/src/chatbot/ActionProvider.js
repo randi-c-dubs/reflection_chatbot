@@ -1,5 +1,5 @@
 import Contexts from "./BotContext";
-import GPT from "../gpt/GPTController"
+import GPT from "../gpt/GPTController";
 
 // The ActionProvider class controls what the chatbot does and responds
 class ActionProvider {
@@ -16,8 +16,6 @@ class ActionProvider {
     this.createClientMessage = createClientMessage;
     this.stateRef = stateRef;
     this.createCustomMessage = createCustomMessage;
-
-    this.apiAttemptLimit = 5;
 
     // move to initial config, update msgLog in state or it will get overwritten
     this.msgLog = [
@@ -54,8 +52,65 @@ class ActionProvider {
     this.updateBotContext(Contexts.FeedbackStakeholders);
   };
 
+  /**  Design Journal Actions   **/
+  handleDesignJournal = async (func) => {
+    if (func === "start") {
+      this.updateBotContext(Contexts.DesignStart);
+
+      let prompt = `prompt: Rephrase the following in your own voice: "It looks like you're just getting started with your design journal. Which part would you like to work on?"`;
+      // TODO have GPT rephrase message
+      let resp = prompt;
+      this.sendBotMessage(
+        this.createChatBotMessage(resp, { widget: "designJournalMenu" })
+      );
+    } else {
+      this.sendBotMessage(
+        this.createChatBotMessage(`Design Journal ${func}`)
+      );
+    }
+  };
+
+  /**  Help Actions  **/
+  handleHelp = async (func) => {
+    if (func === "start") {
+    this.updateBotContext(Contexts.HelpStart);
+
+    let prompt = `prompt: Rephrase the following in your own voice: "What can I help you with?"`;
+    // TODO have GPT rephrase message
+    let resp = prompt;
+    this.sendBotMessage(
+      this.createChatBotMessage(resp, { widget: "helpMenu" })
+    );
+    } else {
+      this.sendBotMessage(
+        this.createChatBotMessage(`Help ${func}`)
+      );
+    }
+  };
+
+  /**  Feedback Actions  **/
+  handleFeedback = async (func) => {
+    if (func === "start") {
+    this.updateBotContext(Contexts.FeedbackStart);
+
+    // TODO save state of design journal and use it to populate feedback options
+    let prompt = `prompt: Rephrase the following in your own voice: "I'd be happy to give you feedback. From what I see in your design journal, we can talk about X, Y, or Z?"`;
+    // TODO have GPT rephrase message
+    let resp = prompt;
+    this.sendBotMessage(
+      this.createChatBotMessage(resp)
+    )
+    } else {
+      this.sendBotMessage(
+        this.createChatBotMessage(`Feedback ${func}`)
+      );
+    }
+  };
+
   say = (botMsg = "hello world") => {
-    this.sendBotMessage(botMsg);
+    this.sendBotMessage(
+      this.createChatBotMessage(botMsg)
+    );
   };
 
   updateBotContext = (newContext) => {
@@ -65,9 +120,8 @@ class ActionProvider {
     }));
   };
 
-  sendBotMessage = (msg) => {
+  sendBotMessage = (botMessage) => {
     // post response to chat interface
-    const botMessage = this.createChatBotMessage(msg);
     this.setState((prev) => ({
       ...prev,
       messages: [...prev.messages, botMessage],
