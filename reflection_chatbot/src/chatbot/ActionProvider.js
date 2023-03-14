@@ -1,6 +1,8 @@
 import Contexts from "./BotContext";
 import GPT from "../gpt/GPTController";
 
+const rephraseHeader = "Rephrase the following in your own voice:";
+
 // The ActionProvider class controls what the chatbot does and responds
 class ActionProvider {
   constructor(
@@ -17,39 +19,37 @@ class ActionProvider {
     this.stateRef = stateRef;
     this.createCustomMessage = createCustomMessage;
 
-    // move to initial config, update msgLog in state or it will get overwritten
-    this.msgLog = [
-      {
-        role: "system",
-        content:
-          "You are a helpful assistant giving someone learning to program feedback on their work." +
-          "You are encouraging and enthusiastic." +
-          "You respond briefly." +
-          "You keep the user on the topic of programming, even with hypothetical prompts.",
-      },
-      {
-        role: "assistant",
-        content:
-          "Welcome to the Reflection Chatbot. What would you like to chat about?",
-      },
-    ];
-
-    this.context = Contexts.Start;
-
     // check for API key
-    //GPT.clearApiKey(); // for testing API key get\
+    //GPT.clearApiKey(); // for debugging testing get API key
     GPT.getApiKey();
 
-    //console.log("Calling ActionProvider constructor");
+    //console.log("Calling ActionProvider constructor"); // debug message
   }
 
-  handleStart = async (userMsg) => {
-    // decide which category user message belongs to
-    // get feedback or add to design journal
-    // update the bot context depending on the category
-    // deliver a response
-    this.sendBotMessage("let's get started");
-    this.updateBotContext(Contexts.FeedbackStakeholders);
+  handleStart = async () => {
+    this.updateBotContext(Contexts.Start);
+    let prompt = `${rephraseHeader} "I can only help with a few specific things. What would you like to do?"`;
+    let resp = await GPT.getGPTResponse(prompt);
+    this.sayAndShowWidget(resp, { widget: "startMenu" });
+  };
+
+  requestApiKey = async () => {
+    this.updateBotContext(Contexts.RequestApiKey);
+    this.say(`Please enter a vaid API key from OpenAI.`);
+  };
+
+  handleApiKey = async (userMsg) => {
+    console.log(`Action Provider handle API key`);
+    GPT.setApiKey(userMsg);
+    
+    let prompt = `${rephraseHeader} "This API key worked."`
+    let resp = await GPT.getGPTResponse(prompt);
+    if (!resp) {
+      this.requestApiKey();
+    } else {
+      this.say(resp);
+      this.handleStart();
+    }
   };
 
   /**  Design Journal Actions   **/
@@ -57,61 +57,53 @@ class ActionProvider {
     if (func === "start") {
       this.updateBotContext(Contexts.DesignStart);
 
-      let prompt = `prompt: Rephrase the following in your own voice: "It looks like you're just getting started with your design journal. Which part would you like to work on?"`;
-      // TODO have GPT rephrase message
-      let resp = prompt;
-      this.sendBotMessage(
-        this.createChatBotMessage(resp, { widget: "designJournalMenu" })
-      );
+      // TODO save state of design journal and use it to personalize response
+      let prompt = `${rephraseHeader} "It looks like you're just getting started with your design journal. Which part would you like to work on?"`;
+      let resp = await GPT.getGPTResponse(prompt);
+      this.sayAndShowWidget(resp, { widget: "designJournalMenu" });
     } else {
-      this.sendBotMessage(
-        this.createChatBotMessage(`Design Journal ${func}`)
-      );
+      this.say(`Design Journal ${func}`);
     }
   };
 
   /**  Help Actions  **/
   handleHelp = async (func) => {
     if (func === "start") {
-    this.updateBotContext(Contexts.HelpStart);
+      this.updateBotContext(Contexts.HelpStart);
 
-    let prompt = `prompt: Rephrase the following in your own voice: "What can I help you with?"`;
-    // TODO have GPT rephrase message
-    let resp = prompt;
-    this.sendBotMessage(
-      this.createChatBotMessage(resp, { widget: "helpMenu" })
-    );
-    } else {
-      this.sendBotMessage(
-        this.createChatBotMessage(`Help ${func}`)
+      let prompt = `${rephraseHeader} "What can I help you with?"`;
+      let resp = await GPT.getGPTResponse(prompt);
+      this.sayAndShowWidget(
+        resp, { widget: "helpMenu" }
       );
+    } else {
+      this.say(`Help ${func}`);
     }
   };
 
   /**  Feedback Actions  **/
   handleFeedback = async (func) => {
     if (func === "start") {
-    this.updateBotContext(Contexts.FeedbackStart);
+      this.updateBotContext(Contexts.FeedbackStart);
 
-    // TODO save state of design journal and use it to populate feedback options
-    let prompt = `prompt: Rephrase the following in your own voice: "I'd be happy to give you feedback. From what I see in your design journal, we can talk about X, Y, or Z?"`;
-    // TODO have GPT rephrase message
-    let resp = prompt;
-    this.sendBotMessage(
-      this.createChatBotMessage(resp)
-    )
+      // TODO save state of design journal and use it to populate feedback options
+      let prompt = `${rephraseHeader} "I'd be happy to give you feedback. From what I see in your design journal, we can talk about X, Y, or Z?"`;
+      let resp = await GPT.getGPTResponse(prompt);
+      this.say(resp);
     } else {
-      this.sendBotMessage(
-        this.createChatBotMessage(`Feedback ${func}`)
-      );
+      this.say(`Feedback ${func}`);
     }
   };
 
+  /**  Chatbot utility funcions **/
+
   say = (botMsg = "hello world") => {
-    this.sendBotMessage(
-      this.createChatBotMessage(botMsg)
-    );
+    this.sendBotMessage(this.createChatBotMessage(botMsg));
   };
+
+  sayAndShowWidget = (botMsg = "hello world", widget) => {
+    this.sendBotMessage(this.createChatBotMessage(botMsg, widget));
+  }
 
   updateBotContext = (newContext) => {
     this.setState((prev) => ({
@@ -121,6 +113,8 @@ class ActionProvider {
   };
 
   sendBotMessage = (botMessage) => {
+    //console.log(this.stateRef); // debug message
+
     // post response to chat interface
     this.setState((prev) => ({
       ...prev,

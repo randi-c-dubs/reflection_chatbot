@@ -1,5 +1,6 @@
 const Contexts = {
       Start: Symbol("start"),
+      RequestApiKey: Symbol("request api key"),
 
       HelpStart: Symbol("get help"),
 
