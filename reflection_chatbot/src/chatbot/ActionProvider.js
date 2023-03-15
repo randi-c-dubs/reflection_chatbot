@@ -19,10 +19,6 @@ class ActionProvider {
     this.stateRef = stateRef;
     this.createCustomMessage = createCustomMessage;
 
-    // check for API key
-    //GPT.clearApiKey(); // for debugging testing get API key
-    GPT.getApiKey();
-
     //console.log("Calling ActionProvider constructor"); // debug message
   }
 
@@ -94,6 +90,17 @@ class ActionProvider {
       this.say(`Feedback ${func}`);
     }
   };
+
+  /** Create additional actions for the chatbot here **/
+  exampleHandler = async (message) => {
+    // Use prompts to give instructions to GPT 
+    let prompt = `Answer this question about Jibo, an awesome social robot with the personality of a 10-year-old who loves penguins and the color blue: ${message}`;
+    // Call GPT.getGPTResponse to get response from GPT
+    let resp = await GPT.getGPTResponse(prompt);
+
+    // Use "say" or "sayAndShowWidget" functions to have the chatbot reply
+    this.sayAndShowWidget(resp, { widget: "ExampleWidget" });
+  }
 
   /**  Chatbot utility funcions **/
 

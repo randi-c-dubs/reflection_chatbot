@@ -6,6 +6,8 @@ import GPT from "../gpt/GPTController";
 import StartMenu from "./components/OptionsMenus/StartMenu.jsx";
 import HelpMenu from "./components/OptionsMenus/HelpMenu.jsx";
 import DesignJournalMenu from "./components/OptionsMenus/DesignJournalMenu.jsx";
+/* Import additional widgets like so */
+// import ExampleWidget from "./components/JiboWidget.jsx"
 
 const botName = "Reflection Chatbot";
 
@@ -29,7 +31,7 @@ if (apiKey) {
 
 const config = {
   botName: botName,
-  // TODO initialize a GPT controller a part of the config and chatbot state
+  // TODO initialize chatbot state as part of the config 
   initialMessages: [initialMsg],
   widgets: [
     {
@@ -44,6 +46,11 @@ const config = {
       widgetName: "helpMenu",
       widgetFunc: (props) => <HelpMenu {...props} />,
     },
+    /* Add any additional widgets to this list
+    {
+      widgetName: "ExampleWidget",
+      widgetFunc: (props) => <ExampleWidget {...props} />,
+    }*/
   ],
 };
 

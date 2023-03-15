@@ -11,10 +11,8 @@ class MessageParser {
   parse(userMsg) {
     // TODO make sure we're pulling the state from the right place. Seems to be resetting
 
-
-    //console.log(`message parser ${userMsg}`); // for testing message parser
-    console.log(`Message Parser context: ${this.actionProvider.context}`);
-    console.log(userMsg);
+    //console.log(`Message Parser ${userMsg}`); // debug message
+    //console.log(`Message Parser context: ${this.actionProvider.context}`); // debug mesage
 
     // handle receiving API key
     if (userMsg.startsWith("sk-")) {
@@ -32,6 +30,11 @@ class MessageParser {
     else if (this.actionProvider.context === Contexts.RequestApiKey) {
       this.actionProvider.requestApiKey();
     }
+    /** Parse the user input by adding to this else-if list.
+     * Call the appropriate actionProvider function here
+    else if (userMsg.includes("Jibo")) {
+      this.actionProvider.exampleHandler(userMsg);
+    }*/
     else {
       //console.log(`message parser ${userMsg}`); // for testing message parser
     }
