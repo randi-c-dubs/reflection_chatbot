@@ -9,10 +9,10 @@ class MessageParser {
   }
 
   parse(userMsg) {
-    // TODO make sure we're pulling the state from the right place. Seems to be resetting
+    let context = this.actionProvider.stateRef.context ? this.actionProvider.stateRef.context : Contexts.Start;
 
     //console.log(`Message Parser ${userMsg}`); // debug message
-    //console.log(`Message Parser context: ${this.actionProvider.context}`); // debug mesage
+    //console.log(`Message Parser context: ${context.description}`); // debug mesage
 
     // handle receiving API key
     if (userMsg.startsWith("sk-")) {
@@ -20,14 +20,12 @@ class MessageParser {
     }
     // handle starting chatbot
     else if (
-      !this.actionProvider.context ||
-      this.actionProvider.context === Contexts.Start
+      context === Contexts.Start
     ) {
-      console.log("Start state");
       this.actionProvider.handleStart(userMsg);
     } 
     // handle requesting API key
-    else if (this.actionProvider.context === Contexts.RequestApiKey) {
+    else if (context === Contexts.RequestApiKey) {
       this.actionProvider.requestApiKey();
     }
     /** Parse the user input by adding to this else-if list.
