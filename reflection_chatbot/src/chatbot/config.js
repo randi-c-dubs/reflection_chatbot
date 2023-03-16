@@ -9,9 +9,13 @@ import DesignJournalMenu from "./components/OptionsMenus/DesignJournalMenu.jsx";
 /* Import additional widgets like so */
 // import ExampleWidget from "./components/JiboWidget.jsx"
 
-const botName = "Reflection Chatbot";
+const botName = "Sparki";
 
 const apiKey = GPT.getApiKey();
+
+let nameMsg = createChatBotMessage(
+  `Hi, I'm ${botName}. A chatbot designed to help my users spark new ideas.`
+);
 
 let initialMsg;
 if (apiKey) {
@@ -32,7 +36,7 @@ if (apiKey) {
 const config = {
   botName: botName,
   // TODO initialize chatbot state as part of the config 
-  initialMessages: [initialMsg],
+  initialMessages: [nameMsg, initialMsg],
   widgets: [
     {
       widgetName: "startMenu",
