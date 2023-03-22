@@ -1,4 +1,4 @@
-//import GPT from "../gpt/GPTController";
+import GPT from "../gpt/GPTController";
 import Contexts from "./BotContext";
 
 // The MessageParse class analyzes words sent to the chatbot and calls the appropriate ActionProvider function
@@ -8,7 +8,7 @@ class MessageParser {
     this.state = state;
   }
 
-  parse(userMsg) {
+  async parse(userMsg) {
     let context = this.actionProvider.stateRef.context ? this.actionProvider.stateRef.context : Contexts.Start;
 
     //console.log(`Message Parser ${userMsg}`); // debug message

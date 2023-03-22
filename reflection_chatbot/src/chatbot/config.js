@@ -21,7 +21,7 @@ let initialMsg;
 if (apiKey) {
   console.log(`config Received API key ${apiKey}`);
   initialMsg = createChatBotMessage(
-    `Hi, I'm ${botName}. What would you like to do?`,
+    `What would you like to do?`,
     {
       widget: "startMenu",
     }
@@ -29,7 +29,7 @@ if (apiKey) {
 } else {
   console.log(`config Didn't receive API key ${apiKey}`);
   initialMsg = createChatBotMessage(
-    `Hi, I'm ${botName}. To get started, can you enter an OpenAI API key?`
+    `To get started, can you enter an OpenAI API key?`
   );
 }
 
