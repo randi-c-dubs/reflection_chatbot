@@ -7,6 +7,7 @@ import config from "./chatbot/config";
 
 import "./App.css";
 import 'react-chatbot-kit/build/main.css';
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 function App() {
   return (
