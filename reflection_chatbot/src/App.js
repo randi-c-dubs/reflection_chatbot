@@ -5,9 +5,10 @@ import ActionProvider from "./chatbot/ActionProvider";
 import MessageParser from "./chatbot/MessageParser";
 import config from "./chatbot/config";
 
-import "./App.css";
 import 'react-chatbot-kit/build/main.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import 'bootstrap-icons/font/bootstrap-icons.css';
+import "./App.css";
 
 function App() {
   return (
