@@ -70,7 +70,7 @@ class ActionProvider {
       let prompt = `${rephraseHeader} "What can I help you with?"`;
       let resp = await GPT.getGPTResponse(prompt);
       this.sayAndShowWidget(
-        resp, { widget: "helpMenu" }
+        resp, { widget: "tutorialExample" }
       );
     } else {
       this.say(`Help ${func}`);

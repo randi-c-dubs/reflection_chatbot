@@ -6,8 +6,10 @@ import GPT from "../gpt/GPTController";
 import StartMenu from "./components/OptionsMenus/StartMenu.jsx";
 import HelpMenu from "./components/OptionsMenus/HelpMenu.jsx";
 import DesignJournalMenu from "./components/OptionsMenus/DesignJournalMenu.jsx";
+import TutorialWidget from "./components/Tutorials/TutorialWidget.jsx";
+import Contexts from "./BotContext";
 /* Import additional widgets like so */
-// import ExampleWidget from "./components/JiboWidget.jsx"
+// import ExampleWidget from "./components/ExampleWidget.jsx"
 
 const botName = "Sparki";
 
@@ -20,12 +22,9 @@ let nameMsg = createChatBotMessage(
 let initialMsg;
 if (apiKey) {
   console.log(`config Received API key ${apiKey}`);
-  initialMsg = createChatBotMessage(
-    `What would you like to do?`,
-    {
-      widget: "startMenu",
-    }
-  );
+  initialMsg = createChatBotMessage(`What would you like to do?`, {
+    widget: "startMenu",
+  });
 } else {
   console.log(`config Didn't receive API key ${apiKey}`);
   initialMsg = createChatBotMessage(
@@ -35,8 +34,11 @@ if (apiKey) {
 
 const config = {
   botName: botName,
-  // TODO initialize chatbot state as part of the config 
+  // TODO initialize chatbot state as part of the config
   initialMessages: [nameMsg, initialMsg],
+  state: {
+    context: Contexts.Start,
+  },
   widgets: [
     {
       widgetName: "startMenu",
@@ -49,6 +51,13 @@ const config = {
     {
       widgetName: "helpMenu",
       widgetFunc: (props) => <HelpMenu {...props} />,
+    },
+    {
+      widgetName: "tutorialExample",
+      widgetFunc: (props) => <TutorialWidget {...props} />,
+      props: {
+        tutorialName: "exampleDeck"
+      },
     },
     /* Add any additional widgets to this list
     {
