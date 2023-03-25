@@ -91,6 +91,22 @@ class ActionProvider {
     }
   };
 
+  /** Show Scratch Code **/
+  handleScratchCode = async (message) => {
+    // follow block syntax: https://en.scratch-wiki.info/wiki/Block_Plugin/Syntax
+    let code = "when gf clicked\n" +
+    "say [Hello, world]";
+
+    // update scratchCode var in state to set Scratch code
+    this.setState((prev) => ({
+      ...prev,
+      scratchCode: code
+    }));
+
+    this.sayAndShowWidget("Here's some code:", "displayScratchCode");
+    
+  }
+
   /** Create additional actions for the chatbot here **/
   exampleHandler = async (message) => {
     // Use prompts to give instructions to GPT 

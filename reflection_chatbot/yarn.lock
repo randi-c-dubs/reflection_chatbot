@@ -8265,6 +8265,11 @@
     "ajv" "^6.12.2"
     "ajv-keywords" "^3.4.1"
 
+"scratchblocks@^3.6.1":
+  "integrity" "sha512-rDU5mS4n53nRl0GoLbc0gdev+xgEJbZH9eXvW05KDZfDQ2xJ8WSbnUw/BUhMQMbhbHcIrfdyiiByIdj5MDSgcw=="
+  "resolved" "https://registry.npmjs.org/scratchblocks/-/scratchblocks-3.6.1.tgz"
+  "version" "3.6.1"
+
 "select-hose@^2.0.0":
   "integrity" "sha512-mEugaLK+YfkijB4fx0e6kImuJdCIt2LxCRcbEYPqRGCs4F2ogyfZU5IAZRdjCP8JPq2AtdNoC/Dux63d9Kiryg=="
   "resolved" "https://registry.npmjs.org/select-hose/-/select-hose-2.0.0.tgz"

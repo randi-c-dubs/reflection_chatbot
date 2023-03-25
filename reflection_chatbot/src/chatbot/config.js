@@ -7,6 +7,7 @@ import StartMenu from "./components/OptionsMenus/StartMenu.jsx";
 import HelpMenu from "./components/OptionsMenus/HelpMenu.jsx";
 import DesignJournalMenu from "./components/OptionsMenus/DesignJournalMenu.jsx";
 import TutorialWidget from "./components/Tutorials/TutorialWidget.jsx";
+import ScratchWidget from "./components/ScratchWidget.jsx"
 import Contexts from "./BotContext";
 /* Import additional widgets like so */
 // import ExampleWidget from "./components/ExampleWidget.jsx"
@@ -38,6 +39,7 @@ const config = {
   initialMessages: [nameMsg, initialMsg],
   state: {
     context: Contexts.Start,
+    scratchCode: `say [Hello! I'm ${botName}]`
   },
   widgets: [
     {
@@ -58,6 +60,11 @@ const config = {
       props: {
         tutorialName: "exampleDeck"
       },
+    },
+    {
+      widgetName: "displayScratchCode",
+      widgetFunc: (props) => <ScratchWidget {...props} />,
+      mapStateToProps: ['scratchCode'],
     },
     /* Add any additional widgets to this list
     {
