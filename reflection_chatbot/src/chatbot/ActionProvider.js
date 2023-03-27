@@ -51,7 +51,6 @@ class ActionProvider {
   /**  Design Journal Actions   **/
   handleDesignJournal = async (message) => {
     if (message === "button start") {
-
       // TODO save state of design journal and use it to personalize response
       let prompt = `${rephraseHeader} "It looks like you're just getting started with your design journal. Which part would you like to work on?"`;
       let resp = await GPT.getGPTResponse(prompt);
@@ -59,7 +58,7 @@ class ActionProvider {
     } else {
       this.say(`Design Journal ${message}`);
     }
-    
+
     // Update the context so the bot knows to keep the design jounal discussion message log
     this.updateContext(Contexts.DesignJournal);
   };
@@ -68,17 +67,72 @@ class ActionProvider {
   handleHelp = async () => {
     this.updateContext(Contexts.Help);
 
-    this.sayAndShowWidget("Here is some information about Sparki", { widget: "helpCards" });
+    this.sayAndShowWidget("Here is some information about Sparki", {
+      widget: "helpCards",
+    });
   };
 
   /** Stub Scratch Code Displayer **/
-  handleScratchCode = async () => {
+  handleScratchCode = async (message) => {
+    // Update the context so the bot knows to keep the Scratch discussion
     this.updateContext(Contexts.ScratchChat);
 
-    // follow block syntax: https://en.scratch-wiki.info/wiki/Block_Plugin/Syntax
-    this.setScratchCode("when gf clicked"); // \nsay [Hello, world]");
+    if (message === "button start") {
+      let prompt = `${rephraseHeader} What are you coding today?`;
+      let resp = await GPT.getGPTResponse(prompt);
 
-    this.sayAndShowWidget("Check out this code:", { widget: "displayScratchCode" });
+      this.say(resp);
+    } else {
+      // TODO add instructions to follow block syntax: https://en.scratch-wiki.info/wiki/Block_Plugin/Syntax
+      let promptAndMsg =
+        `Respond to this INPUT question about Scratch programming. If the user asks for example code give code in Scratch text ` +
+        `format between \`\`\` with one sentence describing how the code works at the end.\n` + 
+        `Example 1: INPUT What ideas do you have for making a chatbot? OUTPUT If you want to make a chatbot in Scratch you could use blocks like ` +
+        `ask and answer blocks to get user input. If you save the user input in a variable, then you could have the chatbot use the input later.\n` +
+        `Example 2: INPUT Can you show me an example of using the ask block and saving it in a variable? OUTPUT ` +
+        `\`\`\`\nwhen green flag clicked\nask [What is your name?] and wait\nset (name v) to (answer)\n\`\`\`\n This code asks ` +
+        `a user their name then saves it in a variable called "name" that the sprite can access later.\n` +
+        `INPUT ${message} OUTPUT`;
+
+      let resp = await GPT.getChattyGPTResponse(
+        this.stateRef.contextMessages,
+        promptAndMsg
+      );
+      console.log(resp); // debug message
+
+      // the code is all the text between ``
+      const codeRegex = /(?<=```)[\s\S]*?(?=```)/g;
+      const codeMatches = resp.match(codeRegex);
+      if (codeMatches && codeMatches.length > 0) {
+        // console.log(codeMatches[0]); // debug message
+        this.setState((prev) => ({
+          ...prev,
+          scratchCode: codeMatches[0],
+        }));
+
+        // ChatGPT usually explains its coding
+        const nonCodeRegex = /```/;
+        const nonCodeMatches = resp.split(nonCodeRegex);
+
+        let withCodeResp = "Check out this example";
+        if (nonCodeMatches && nonCodeMatches.length > 2)
+          withCodeResp = nonCodeMatches[2];
+
+        // Add the users' message to the context messages
+        this.updateContextMessages(this.createClientMessage(message));
+        // Use "say" or "sayAndShowWidget" functions to have the chatbot reply
+        this.sayAndShowWidget(withCodeResp, {
+          widget: "displayScratchCode",
+        });
+      }
+      // if there was a failure to get code for some reason, deliver the response
+      else {
+        // Add the users' message to the context messages
+        this.updateContextMessages(this.createClientMessage(message));
+        // Use "say" or "sayAndShowWidget" functions to have the chatbot reply
+        this.say(resp);
+      }
+    }
   };
 
   /** Jibo Handler **/
@@ -89,7 +143,7 @@ class ActionProvider {
     if (message === "button start") {
       let prompt = `${rephraseHeader} "What would you like to learn about Jibo?"`;
       let resp = await GPT.getGPTResponse(prompt);
-      
+
       // Use "say" or "sayAndShowWidget" functions to have the chatbot reply
       this.sayAndShowWidget(resp, { widget: "exampleJiboWidget" });
     } else {
@@ -98,7 +152,10 @@ class ActionProvider {
 
       // Call GPT.getChattyGPTResponse to get response from GPT
       // You can also use getGPTResponse to get a briefer response
-      let resp = await GPT.getChattyGPTResponse(this.stateRef.contextMessages, promptAndMsg);
+      let resp = await GPT.getChattyGPTResponse(
+        this.stateRef.contextMessages,
+        promptAndMsg
+      );
 
       // Add the users' message to the context messages
       this.updateContextMessages(this.createClientMessage(promptAndMsg));
