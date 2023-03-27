@@ -5,7 +5,6 @@
   top: 50px;
   right: 300px;
   width: 100%;
-  max-width: 350px;
 }
 
 /* Hide information box on smaller screens */
@@ -25,10 +24,21 @@
   cursor: pointer; /* Mouse pointer on hover */
 }
 
+.btn.tutorial-right-btn:hover,
+.btn.tutorial-left-btn:hover {
+  background-color: #59adff;
+}
+
 .tutorial-left-btn {
   position: absolute;
   left: -25px;
   top: 50%;
+}
+
+.slide-num {
+  position: absolute;
+  width:191px;
+  bottom: 0;
 }
 
 .tutorial-right-btn {

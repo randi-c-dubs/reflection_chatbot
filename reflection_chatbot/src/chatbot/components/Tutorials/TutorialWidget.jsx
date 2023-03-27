@@ -17,11 +17,11 @@ const TutorialWidget = ({ tutorialName }) => {
   const totalCards = cards.length;
 
   const nextSlide = () => {
-    setCurrent(current === totalCards ? 1 : current + 1);
+    setCurrent(current + 1);
   };
 
   const prevSlide = () => {
-    setCurrent(current === totalCards ? 1 : current - 1);
+    setCurrent(current - 1);
   };
 
   const closeCards = () => {
@@ -55,6 +55,7 @@ const TutorialWidget = ({ tutorialName }) => {
                 className={card.index === current ? "slide active" : "slide"}
                 key={card.index}
                 card={card}
+                totalCards={cards.length}
               />
             )
           );
