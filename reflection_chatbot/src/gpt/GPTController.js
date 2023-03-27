@@ -2,14 +2,47 @@
 class GPTController {
   static apiAttemptLimit = 1;
   static devMode = false; // set to "true" if you're just testing and don't want to hit GPT API, go to "false" if you do want a real GPT response
-
   static systemMsg = {
     role: "system",
     content:
-      "You are a helpful assistant giving someone learning to program feedback on their work." +
-      "You are encouraging and enthusiastic." +
-      "You respond briefly." +
-      "You keep the user on the topic of programming, even with hypothetical prompts.",
+      "You are a helpful assistant who responds encouragingly and enthusiastically." +	
+      "You respond in 3 sentences or less." +	
+      "You keep the user on the topics of programming and AI, even with hypothetical prompts.",
+  };
+  // Chatbot message format message: "", role: "user | bot" 
+  // ChatGPT message format content: "", role: "system | user | assistant"
+  static botToGPTMessages = (messages) => {
+    const gptMessages = messages.map((msg) => (
+      {
+        content: msg.message,
+        role: msg.role === "user" ? msg.role : "assistant",
+      }
+    ));
+
+    return [GPTController.systemMsg, ...gptMessages];
+  }
+  static getChattyGPTResponse = async (msgLog, newMsg) => { 
+    let resp;
+    
+    // in dev mode, don't do the GPT request, just return the message
+    if (GPTController.devMode) {
+      resp = `prompt: ${newMsg}`;
+    } else {
+      let completeLog = this.botToGPTMessages(msgLog);
+      completeLog.push({
+        content: newMsg,
+        role: "user"
+      });
+
+      // make request of gpt
+      let fullResponse = await GPTController.sendGPTRequest(completeLog);
+      //console.log(fullResponse); // debug message
+      if (fullResponse) {
+        resp = fullResponse.choices[0].message.content;
+      }
+    }
+    // return GPT message
+    if (resp) return resp;
   };
 
   static getGPTResponse = async (message) => {
@@ -21,7 +54,6 @@ class GPTController {
     } else {
       // update message log
       let msgLog = [
-        GPTController.systemMsg,
         {
           role: "user",
           content: message,
@@ -29,16 +61,10 @@ class GPTController {
       ];
 
       // make request of gpt
-      // if there is an error (hopefully because of api key issue) will get stuck in a loop
-      // TODO at attempt limit, display error message and pause chatbot
-      let attempts = 0;
-      while (!resp && attempts < GPTController.apiAttemptLimit) {
-        let fullResponse = await GPTController.sendGPTRequest(msgLog);
-        //console.log(fullResponse); // debug message
-        if (fullResponse) {
-          resp = fullResponse.choices[0].message.content;
-        }
-        attempts++;
+      let fullResponse = await GPTController.sendGPTRequest(msgLog);
+      //console.log(fullResponse); // debug message
+      if (fullResponse) {
+        resp = fullResponse.choices[0].message.content;
       }
     }
 
@@ -61,34 +87,40 @@ class GPTController {
       model: "gpt-3.5-turbo", // using chatgpt api
       messages: msgLog,
       temperature: 0.7,
-      max_tokens: 96,
+      max_tokens: 256,
       top_p: 1,
       n: 1,
       frequency_penalty: 0,
       presence_penalty: 0.3,
     });
 
-    try {
-      const r = await fetch(
-        `https://api.openai.com/v1/chat/completions`,
-        options
-      );
-      if (!r.ok) {
-        if (r.status === 401) {
-          GPTController.clearApiKey();
+    // if there is an error (hopefully because of api key issue) will get stuck in a loop
+    // TODO at attempt limit, display error message and pause chatbot
+    let attempts = 0;
+    while (attempts < GPTController.apiAttemptLimit) {
+      attempts++;
+      try {
+        const r = await fetch(
+          `https://api.openai.com/v1/chat/completions`,
+          options
+        );
+        if (!r.ok) {
+          if (r.status === 401) {
+            GPTController.clearApiKey();
+          }
+          const res = await r.json();
+          throw new Error(res.error);
         }
-        const res = await r.json();
-        throw new Error(res.error);
-      }
 
-      const res = await r.json();
-      if (res.choices.length > 0) {
-        //console.log(`request success ${res}`); // debug message
-        return res;
+        const res = await r.json();
+        if (res.choices.length > 0) {
+          //console.log(`request success ${res}`); // debug message
+          return res;
+        }
+      } catch (e) {
+        console.log("There was an error fetching suggested sentences");
+        console.log(e);
       }
-    } catch (e) {
-      console.log("There was an error fetching suggested sentences");
-      console.log(e);
     }
   };
 
