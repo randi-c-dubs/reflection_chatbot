@@ -1,3 +1,9 @@
+/*!
+	Copyright (c) 2018 Jed Watson.
+	Licensed under the MIT License (MIT), see
+	http://jedwatson.github.io/classnames
+*/
+
 /*! regenerator-runtime -- Copyright (c) 2014-present, Facebook, Inc. -- license (MIT): https://github.com/facebook/regenerator/blob/main/LICENSE */
 
 /**
@@ -38,4 +44,13 @@
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
+ */
+
+/**
+ * scratchblocks v3.6.1
+ * https://scratchblocks.github.io/
+ * Render scratchblocks code to SVG images.
+ *
+ * Copyright 2013–2022, Tim Radvan
+ * @license MIT
  */
