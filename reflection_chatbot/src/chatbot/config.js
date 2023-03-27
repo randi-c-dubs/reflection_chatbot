@@ -2,15 +2,14 @@ import React from "react";
 import { createChatBotMessage } from "react-chatbot-kit";
 
 import GPT from "../gpt/GPTController";
+import Contexts from "./BotContext";
 
 import StartMenu from "./components/OptionsMenus/StartMenu.jsx";
-import HelpMenu from "./components/OptionsMenus/HelpMenu.jsx";
 import DesignJournalMenu from "./components/OptionsMenus/DesignJournalMenu.jsx";
 import TutorialWidget from "./components/Tutorials/TutorialWidget.jsx";
 import ScratchWidget from "./components/ScratchWidget.jsx"
-import Contexts from "./BotContext";
+import ExampleWidget from "./components/ExampleWidget.jsx"
 /* Import additional widgets like so */
-// import ExampleWidget from "./components/ExampleWidget.jsx"
 
 const botName = "Sparki";
 
@@ -35,10 +34,10 @@ if (apiKey) {
 
 const config = {
   botName: botName,
-  // TODO initialize chatbot state as part of the config
   initialMessages: [nameMsg, initialMsg],
   state: {
     context: Contexts.Start,
+    contextMessages: [],
     scratchCode: `say [Hello! I'm ${botName}]`
   },
   widgets: [
@@ -51,14 +50,10 @@ const config = {
       widgetFunc: (props) => <DesignJournalMenu {...props} />,
     },
     {
-      widgetName: "helpMenu",
-      widgetFunc: (props) => <HelpMenu {...props} />,
-    },
-    {
-      widgetName: "tutorialExample",
+      widgetName: "helpCards",
       widgetFunc: (props) => <TutorialWidget {...props} />,
       props: {
-        tutorialName: "exampleDeck"
+        tutorialName: "helpDeck"
       },
     },
     {
@@ -66,11 +61,12 @@ const config = {
       widgetFunc: (props) => <ScratchWidget {...props} />,
       mapStateToProps: ['scratchCode'],
     },
-    /* Add any additional widgets to this list
+    
+    /** Add any additional widgets to this list */
     {
-      widgetName: "ExampleWidget",
+      widgetName: "exampleJiboWidget",
       widgetFunc: (props) => <ExampleWidget {...props} />,
-    }*/
+    }
   ],
 };
 

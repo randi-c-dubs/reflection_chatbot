@@ -76,7 +76,7 @@ else if (userMsg.includes("Jibo")) {
 
 ## Responding as the chatbot
 
-Functions for having the chatbot respond to the user are found in _chatbot/ActionProvider.js_. Create a new function to respond to what the user says and show any applicable widgets. The utility functions `say` and `sayAndShowWidget` are wrappers for posting messages and widgets to the chatbot interface. You can update the chatbot's [context or state](https://www.chatbot.com/help/stories/what-is-context/) using the `updateBotContext` function.
+Functions for having the chatbot respond to the user are found in _chatbot/ActionProvider.js_. Create a new function to respond to what the user says and show any applicable widgets. The utility functions `say` and `sayAndShowWidget` are wrappers for posting messages and widgets to the chatbot interface. You can update the chatbot's [context or state](https://www.chatbot.com/help/stories/what-is-context/) using the `updateContext` function.
 
 ```
 exampleHandler = async (message) => {
