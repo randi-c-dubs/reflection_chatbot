@@ -1,7 +1,7 @@
 {
   "files": {
-    "main.css": "/reflection_chatbot/static/css/main.ab79712e.css",
-    "main.js": "/reflection_chatbot/static/js/main.2d3e5f2a.js",
+    "main.css": "/reflection_chatbot/static/css/main.513501d3.css",
+    "main.js": "/reflection_chatbot/static/js/main.82c6657a.js",
     "static/js/787.bc74c74e.chunk.js": "/reflection_chatbot/static/js/787.bc74c74e.chunk.js",
     "static/media/bootstrap-icons.woff?": "/reflection_chatbot/static/media/bootstrap-icons.6959d0d983ee318f8880.woff",
     "static/media/bootstrap-icons.woff2?": "/reflection_chatbot/static/media/bootstrap-icons.b2e5aab643c6f0fd2da6.woff2",
@@ -10,12 +10,12 @@
     "static/media/help-4-programming-icon.png": "/reflection_chatbot/static/media/help-4-programming-icon.c0535918ff83317c2015.png",
     "static/media/help-2-ethics-icon.png": "/reflection_chatbot/static/media/help-2-ethics-icon.0f00ff3a3f81addb7837.png",
     "index.html": "/reflection_chatbot/index.html",
-    "main.ab79712e.css.map": "/reflection_chatbot/static/css/main.ab79712e.css.map",
-    "main.2d3e5f2a.js.map": "/reflection_chatbot/static/js/main.2d3e5f2a.js.map",
+    "main.513501d3.css.map": "/reflection_chatbot/static/css/main.513501d3.css.map",
+    "main.82c6657a.js.map": "/reflection_chatbot/static/js/main.82c6657a.js.map",
     "787.bc74c74e.chunk.js.map": "/reflection_chatbot/static/js/787.bc74c74e.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.ab79712e.css",
-    "static/js/main.2d3e5f2a.js"
+    "static/css/main.513501d3.css",
+    "static/js/main.82c6657a.js"
   ]
 }
