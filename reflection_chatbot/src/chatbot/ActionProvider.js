@@ -50,15 +50,30 @@ class ActionProvider {
 
   /**  Design Journal Actions   **/
   handleDesignJournal = async (message) => {
+    // Update the context so the bot knows to keep the AI design discussion
+    this.updateContext(Contexts.DesignJournal);
+
     if (message === "button start") {
       // TODO save state of design journal and use it to personalize response
-      let prompt = `${rephraseHeader} "It looks like you're just getting started with your design journal. Which part would you like to work on?"`;
+      let prompt = `${rephraseHeader} Sure, tell me about your AI project.`;
       let resp = await GPT.getGPTResponse(prompt);
-      this.sayAndShowWidget(resp, { widget: "designJournalMenu" });
-    } else {
-      this.say(`Design Journal ${message}`);
-    }
 
+      this.say(resp);
+    } else {
+      let prompt = `INPUT ${message} OUTPUT`;
+      let resp = await GPT.getChattyGPTResponse(
+        this.stateRef.contextMessages,
+        prompt,
+        "design"
+      );
+      console.log(resp); // debug message
+
+      // Add the users' message to the context messages
+      this.updateContextMessages(this.createClientMessage(message));
+      resp.split("\n").forEach((chunk) => {
+        this.say(chunk);
+      });
+    }
     // Update the context so the bot knows to keep the design jounal discussion message log
     this.updateContext(Contexts.DesignJournal);
   };
@@ -84,19 +99,11 @@ class ActionProvider {
       this.say(resp);
     } else {
       // TODO add instructions to follow block syntax: https://en.scratch-wiki.info/wiki/Block_Plugin/Syntax
-      let promptAndMsg =
-        `Respond to this INPUT question about Scratch programming. If the user asks for example code give code in Scratch text ` +
-        `format between \`\`\` with one sentence describing how the code works at the end.\n` + 
-        `Example 1: INPUT What ideas do you have for making a chatbot? OUTPUT If you want to make a chatbot in Scratch you could use blocks like ` +
-        `ask and answer blocks to get user input. If you save the user input in a variable, then you could have the chatbot use the input later.\n` +
-        `Example 2: INPUT Can you show me an example of using the ask block and saving it in a variable? OUTPUT ` +
-        `\`\`\`\nwhen green flag clicked\nask [What is your name?] and wait\nset (name v) to (answer)\n\`\`\`\n This code asks ` +
-        `a user their name then saves it in a variable called "name" that the sprite can access later.\n` +
-        `INPUT ${message} OUTPUT`;
-
+      let prompt = `INPUT ${message} OUTPUT`;
       let resp = await GPT.getChattyGPTResponse(
         this.stateRef.contextMessages,
-        promptAndMsg
+        prompt,
+        "programming"
       );
       console.log(resp); // debug message
 
