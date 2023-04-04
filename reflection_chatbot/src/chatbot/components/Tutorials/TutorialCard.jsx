@@ -2,7 +2,7 @@ import Card from "react-bootstrap/Card";
 
 function TutorialCard({ card, totalCards }) {
   return (
-    <Card style={{ width: "225px", height: "350px" }} text="dark">
+    <Card style={{ height: "350px" }} text="dark">
       <Card.Img variant="top" src={card.imageSrc} />
       <Card.Body>
         <Card.Title> {card.name} </Card.Title>

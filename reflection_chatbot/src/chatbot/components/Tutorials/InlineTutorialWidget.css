@@ -1,49 +1,38 @@
-.tutorial-container {
+.inline-tutorial-container {
+  position: relative;
   border-radius: 3px;
-  position: absolute;
   padding: 20px;
-  right: 425px;
-  top: 50px;
-  width:275px;
+  width:350px;
 }
 
-/* Hide information box on smaller screens */
-@media (max-width: 750px) {
-  .tutorial-container {
-    display: none;
-  }
-}
-
-.btn.tutorial-right-btn,
-.btn.tutorial-left-btn  {
+.btn.in-tutorial-right-btn,
+.btn.in-tutorial-left-btn {
   background-color: DodgerBlue; /* Blue background */
   border: none; /* Remove borders */
   color: white; /* White text */
   padding: 12px 16px; /* Some padding */
   font-size: 16px; /* Set a font size */
   cursor: pointer; /* Mouse pointer on hover */
+  position: absolute;
+  top: 50%;
 }
 
-.btn.tutorial-right-btn:hover,
-.btn.tutorial-left-btn:hover {
+.btn.in-tutorial-right-btn:hover,
+.btn.in-tutorial-left-btn:hover {
   background-color: #59adff;
 }
 
-.tutorial-left-btn {
-  position: absolute;
+.in-tutorial-left-btn {
   left: -20px;
-  top: 50%;
 }
 
-.tutorial-right-btn {
-  position: absolute;
+.in-tutorial-right-btn {
   right: -20px;
-  top: 50%;
 }
 
 .slide-num {
   position: absolute;
-  margin:0 auto;
+  width: 276px;
   bottom: 0;
 }
 

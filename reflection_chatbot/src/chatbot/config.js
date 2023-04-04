@@ -6,6 +6,7 @@ import Contexts from "./BotContext";
 
 import StartMenu from "./components/OptionsMenus/StartMenu.jsx";
 import DesignJournalMenu from "./components/OptionsMenus/DesignJournalMenu.jsx";
+import InlineTutorialWidget from "./components/Tutorials/InlineTutorialWidget.jsx";
 import TutorialWidget from "./components/Tutorials/TutorialWidget.jsx";
 import ScratchWidget from "./components/ScratchWidget.jsx"
 import ExampleWidget from "./components/ExampleWidget.jsx"
@@ -51,7 +52,7 @@ const config = {
     },
     {
       widgetName: "helpCards",
-      widgetFunc: (props) => <TutorialWidget {...props} />,
+      widgetFunc: (props) => <InlineTutorialWidget {...props} />,
       props: {
         tutorialName: "helpDeck"
       },
