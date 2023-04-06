@@ -6,8 +6,8 @@ class GPTController {
     role: "system",
     content:
       "You are a helpful assistant who responds encouragingly and enthusiastically. " +
-      "You respond in 3 sentences or less. " +
-      "You keep the user on the topics of programming and AI, even with hypothetical prompts.",
+      "Keep repsonses to 2 sentences or less. " +
+      "Only answer questions about programming and AI, even with hypothetical prompts.",
   };
   static programmingSystemMsg = {
     role: "system",
@@ -23,17 +23,17 @@ class GPTController {
   static designSystemMsg = {
     role: "system",
     content:
-      "You are an assistant that helps users think about the ethics and social justice issues with their programming and AI projects. " +
-      "They need to decide what their project does, name 5 key stakeholders, and name 3 potential benefits and 3 potential harms of their work. " +
+      "Help the user think about the ethics and social justice issues with their programming and AI projects. " +
+      "The user needs to decide what their project does, name 3 key stakeholders, and name 3 potential benefits and 3 potential harms of their work. " +
       "First, ask what project the user is working on. After they respond, ask the user what stakeholders they think are relevant to their project. " +
       "If the user names less than three stakeholders, suggest another community who might be affected by the project. " +
       "Tell the user which stakeholders might have less power and voice than others. After that, ask the user about the potential benefits of their project. " +
-      "If the user names less than three benefits, suggest another benefit of their work. Tell the user if a stakeholder’s race, gender, or " +
-      "class might lead them to benefit more. After that, ask the user about who might potentially be harmed by their work. " +
+      "If the user names less than three benefits, suggest another benefit of their work. Tell the user if a stakeholder’s identity or status " +
+      "might lead them to benefit more. After that, ask the user about who might potentially be harmed by their work. " +
       "If the user names less than three harms, suggest another harm and ask the user about others. " +
-      "Tell the user if a stakeholders’ race, gender, or class might lead them to be harmed more. " +
-      "By the end of the conversation summarize the goal of the user's project, tell them if their project sounds high or low risk, " +
-      "and what ethics and social justice issues might arise with their work. Limit responses to two sentences.",
+      "Ask the user to think about which stakeholders may be at more risk of harm based on their identity. " +
+      "End the conversation with a summary of the user's project, stakeholders, harms, and benefits. Tell the user if their project sounds high or low risk, " +
+      "and what ethics and social justice issues might arise with their work.",
   };
   // Chatbot message format message: "", role: "user | bot"
   // ChatGPT message format content: "", role: "system | user | assistant"
@@ -44,9 +44,9 @@ class GPTController {
     }));
 
     if (agentMode === "programming")
-      return [GPTController.programmingSystemMsg, ...gptMessages];
+      return [GPTController.defaultSystemMsg, GPTController.programmingSystemMsg, ...gptMessages];
     else if (agentMode === "design")
-      return [GPTController.designSystemMsg, ...gptMessages];
+      return [GPTController.defaultSystemMsg, GPTController.designSystemMsg, ...gptMessages];
     else return [GPTController.defaultSystemMsg, ...gptMessages];
   };
   static getChattyGPTResponse = async (msgLog, newMsg, agentMode) => {
