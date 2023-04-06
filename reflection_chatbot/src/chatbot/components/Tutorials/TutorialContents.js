@@ -38,7 +38,7 @@ const TutorialDecks =
         imageSrc: HelpEthicsIcon,
         text:
           `This tool can also talk you through the designs of AI projects -- like goals, potential impacts, and harm mitigation.` +
-          ` Click the "Design Journal" button to see more.`,
+          ` Click the "Discuss AI Project" button to see more.`,
         index: 5,
       },
       {

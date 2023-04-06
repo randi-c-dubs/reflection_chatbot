@@ -24,7 +24,7 @@ class ActionProvider {
 
   handleStart = async () => {
     this.updateContext(Contexts.Start);
-    let prompt = `${rephraseHeader} "I can only help with a few specific things. What would you like to do?"`;
+    let prompt = `${rephraseHeader} "What would you like to do? I can help with a few specific things."`;
     let resp = await GPT.getGPTResponse(prompt);
     this.sayAndShowWidget(resp, { widget: "startMenu" });
   };
@@ -48,7 +48,7 @@ class ActionProvider {
     }
   };
 
-  /**  Design Journal Actions   **/
+  /**  AI Design Actions   **/
   handleDesignJournal = async (message) => {
     // Update the context so the bot knows to keep the AI design discussion
     this.updateContext(Contexts.DesignJournal);

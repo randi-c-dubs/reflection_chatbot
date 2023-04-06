@@ -4,7 +4,7 @@ const Contexts = {
 
       Help: Symbol("get help"),
 
-      DesignJournal: Symbol("work on design journal"),
+      DesignJournal: Symbol("work on "),
 
       ScratchChat: Symbol("talk about Scratch programming"),
 

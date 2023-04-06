@@ -4,12 +4,12 @@ import GenericOptionsMenu from "../GenericOptionsMenu/GenericOptionsMenu";
 const StartMenu = (props) => {
   const options = [
     {
-      opText: "Design journal",
+      opText: "Discuss AI Project",
       opHandler: () => {props.actionProvider.handleDesignJournal("button start")},
       opId: 1,
     },
     {
-      opText: "Scratch programming",
+      opText: "Scratch programming help",
       opHandler: () => {props.actionProvider.handleScratchCode("button start")},
       opId: 2,
     },
