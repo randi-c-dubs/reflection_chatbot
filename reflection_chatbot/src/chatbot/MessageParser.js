@@ -46,10 +46,10 @@ class MessageParser {
     else if (context === Contexts.DesignJournal) {
       let flag = await this.continueOrStopDiscussion(userMsg);
 
-      if (flag.includes("CONTINUE")) {
-        this.actionProvider.handleDesignJournal(userMsg);
-      } else { // TODO something more intelligent with the "NOT SURE"
+      if (flag.includes("QUIT")) {
         this.actionProvider.handleStart(userMsg);
+      } else { // TODO something more intelligent with the "NOT SURE"
+        this.actionProvider.handleDesignJournal(userMsg);
       }
     }
     // continue discussion about Scratch programming
