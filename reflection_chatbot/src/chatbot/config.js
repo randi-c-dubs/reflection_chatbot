@@ -20,24 +20,26 @@ let nameMsg = createChatBotMessage(
   `Hi, I'm ${botName}. A chatbot designed to help my users spark new ideas.`
 );
 
-let initialMsg;
+let initialMsg, initialContext;
 if (apiKey) {
   console.log(`config Received API key ${apiKey}`);
   initialMsg = createChatBotMessage(`What would you like to do?`, {
     widget: "startMenu",
   });
+  initialContext = Contexts.Start;
 } else {
   console.log(`config Didn't receive API key ${apiKey}`);
   initialMsg = createChatBotMessage(
     `To get started, can you enter an OpenAI API key?`
   );
+  initialContext = Contexts.RequestApiKey;
 }
 
 const config = {
   botName: botName,
   initialMessages: [nameMsg, initialMsg],
   state: {
-    context: Contexts.Start,
+    context: initialContext,
     contextMessages: [],
     scratchCode: `say [Hello! I'm ${botName}]`
   },
