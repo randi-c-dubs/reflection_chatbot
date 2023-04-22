@@ -114,13 +114,13 @@ const InputBlockWithButton = ({
       }
       {
         /* Chatbot component or static hint box */
-        botVisible && (
+        <div style={{ display: botVisible ? "block" : "none" }}>
           <Chatbot
             config={config}
             actionProvider={ActionProvider}
             messageParser={MessageParser}
           />
-        )
+        </div>
       }
     </div>
   );
