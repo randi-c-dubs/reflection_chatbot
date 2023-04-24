@@ -58,6 +58,8 @@
     left: calc(100% - 48px);
 }
 
+/* configuring react chatbot https://fredrikoseberg.github.io/react-chatbot-kit-docs/docs/advanced/configuring-css */
+
 .react-chatbot-kit-chat-container {
     position:absolute;
     z-index:1000;
