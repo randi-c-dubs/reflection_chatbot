@@ -1,5 +1,7 @@
 import Contexts from "./BotContext";
 import GPT from "../gpt/GPTController";
+import Storage from "../user_util/StorageLog";
+import Accounts from "../user_util/Accounts";
 
 const rephraseHeader = "Rephrase the following in your own voice:";
 
@@ -29,19 +31,33 @@ class ActionProvider {
     this.sayAndShowWidget(resp, { widget: "startMenu" });
   };
 
-  requestApiKey = async () => {
-    this.updateContext(Contexts.RequestApiKey);
-    this.say(`Please enter a vaid API key from OpenAI.`);
+  requestSecretKey = async () => {
+    this.updateContext(Contexts.RequestSecretKey);
+    this.say(
+      `Please enter a valid secret key or OpenAI API key to use Sparki.`
+    );
   };
+  handleSecretKey = async (userMsg) => {
+    await Accounts.setSecretKey(userMsg);
 
-  handleApiKey = async (userMsg) => {
-    //console.log(`Action Provider handle API key`); // debug message
-    GPT.setApiKey(userMsg);
-
-    let prompt = `${rephraseHeader} "This API key worked."`;
+    // test the key to see if it works
+    let prompt = `${rephraseHeader} "Thank you for the valid key."`;
     let resp = await GPT.getGPTResponse(prompt);
     if (!resp) {
-      this.requestApiKey();
+      this.requestSecretKey();
+    } else {
+      this.say(resp);
+      this.handleStart();
+    }
+  };
+  handleAPIKey = async (userMsg) => {
+    GPT.setApiKey(userMsg, true);
+
+    // test the key to see if it works
+    let prompt = `${rephraseHeader} "Thank you for the valid key."`;
+    let resp = await GPT.getGPTResponse(prompt);
+    if (!resp) {
+      this.requestSecretKey();
     } else {
       this.say(resp);
       this.handleStart();
@@ -85,6 +101,7 @@ class ActionProvider {
     this.sayAndShowWidget("Here is some information about Sparki", {
       widget: "helpCards",
     });
+    this.handleStart();
   };
 
   /** Stub Scratch Code Displayer **/
@@ -210,6 +227,15 @@ class ActionProvider {
   };
 
   sendBotMessage = (botMsg) => {
+    // Store timestamp, bot message, and context
+    // TODO decide what to do about widgets
+    Storage.storeMessage(
+      Date.now(),
+      "Sparki",
+      this.stateRef.context.description,
+      botMsg.message
+    );
+
     //console.log(this.stateRef); // debug message
 
     // post response to chat interface and add to contextMessages

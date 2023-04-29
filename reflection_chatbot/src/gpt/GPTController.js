@@ -1,4 +1,4 @@
-// The GPTController manages all functions and data related to interacting with OpenAI's GPT interface
+// GPTController manages all functions and data related to interacting with OpenAI's GPT interface
 class GPTController {
   static apiAttemptLimit = 1;
   static devMode = false; // set to "true" if you're just testing and don't want to hit GPT API, go to "false" if you do want a real GPT response
@@ -35,6 +35,7 @@ class GPTController {
       "End the conversation with a summary of the user's project, stakeholders, harms, and benefits. Tell the user if their project sounds high or low risk, " +
       "and what ethics and social justice issues might arise with their work.",
   };
+
   // Chatbot message format message: "", role: "user | bot"
   // ChatGPT message format content: "", role: "system | user | assistant"
   static botToGPTMessages = (messages, agentMode) => {
@@ -44,9 +45,17 @@ class GPTController {
     }));
 
     if (agentMode === "programming")
-      return [GPTController.defaultSystemMsg, GPTController.programmingSystemMsg, ...gptMessages];
+      return [
+        GPTController.defaultSystemMsg,
+        GPTController.programmingSystemMsg,
+        ...gptMessages,
+      ];
     else if (agentMode === "design")
-      return [GPTController.defaultSystemMsg, GPTController.designSystemMsg, ...gptMessages];
+      return [
+        GPTController.defaultSystemMsg,
+        GPTController.designSystemMsg,
+        ...gptMessages,
+      ];
     else return [GPTController.defaultSystemMsg, ...gptMessages];
   };
   static getChattyGPTResponse = async (msgLog, newMsg, agentMode) => {
@@ -101,14 +110,11 @@ class GPTController {
   };
 
   static sendGPTRequest = async (msgLog) => {
-    let apiKey = await GPTController.getApiKey();
-    //console.log(`Making request with api key ${apiKey}`); // debug message
-
     const options = {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${apiKey}`,
+        Authorization: `Bearer ${GPTController.getApiKey()}`,
       },
     };
     options.body = JSON.stringify({
@@ -135,9 +141,18 @@ class GPTController {
         if (!r.ok) {
           if (r.status === 401) {
             GPTController.clearApiKey();
+            const res = await r.json();
+            throw new Error(res.error);
+          } else if (r.status === 429) {
+            // TODO get this right
+            setTimeout(() => {
+              GPTController.sendGPTRequest(msgLog);
+              console.log("Retrying");
+            }, 30000);
+          } else {
+            const res = await r.json();
+            throw new Error(res.error);
           }
-          const res = await r.json();
-          throw new Error(res.error);
         }
 
         const res = await r.json();
@@ -152,28 +167,22 @@ class GPTController {
     }
   };
 
-  static setApiKey = (key) => {
+  static setApiKey = (key, persist) => {
     //console.log(`GPTController setting API key ${key}`); // debug message
     if (key && key !== " ") {
-      localStorage.setItem("OPENAI_KEY", key);
+      if (persist) localStorage.setItem("openai_key", key);
+      sessionStorage.setItem("openai_key", key);
     }
   };
 
   static getApiKey = () => {
-    //console.log(`GPTController getting API key`); // debug message
-    let apiKey = localStorage.getItem("OPENAI_KEY");
-
-    if (apiKey && apiKey !== " ") {
-      //console.log(`GPTController got API key ${apiKey}`);
-      return apiKey;
-    }
-
-    return undefined;
+    //console.log(`GPTController getting API key ${key}`); // debug message
+    const apiKey = sessionStorage.getItem("openai_key");
+    if (apiKey && apiKey !== " ") return apiKey;
   };
 
   static clearApiKey = () => {
-    //console.log(`GPTController clearing stored API key`); // debug message
-    localStorage.clear();
+    sessionStorage.removeItem("openai_key");
   };
 }
 
