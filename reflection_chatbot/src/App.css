@@ -44,3 +44,11 @@
     transform: rotate(360deg);
   }
 }
+
+.disclaimer-wrapper > ul {
+  font-size: calc(10px + .75vmin);
+}
+
+.login-wrapper .invalid-feedback {
+  font-size: calc(10px + .75vmin);
+}
