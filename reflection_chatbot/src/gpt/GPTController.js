@@ -1,7 +1,7 @@
 // GPTController manages all functions and data related to interacting with OpenAI's GPT interface
 class GPTController {
   static apiAttemptLimit = 1;
-  static devMode = true; // set to "true" if you're just testing and don't want to hit GPT API, go to "false" if you do want a real GPT response
+  static devMode = false; // set to "true" if you're just testing and don't want to hit GPT API, go to "false" if you do want a real GPT response
   static defaultSystemMsg = {
     role: "system",
     content:

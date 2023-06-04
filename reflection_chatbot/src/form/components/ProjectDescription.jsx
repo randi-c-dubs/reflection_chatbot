@@ -1,34 +1,39 @@
-import React from "react";
+import React, { useState } from "react";
 
 import "./ProjectDescription.css";
-import InputBlock from "./InputBlockWithButton";
+import InputAndChat from "./InputBlockWithChat";
 
 const ProjectDescription = () => {
-  const [formStatus, setFormStatus] = React.useState("Saved");
+  const [formStatus, setFormStatus] = useState("Saved");
+  // project info
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+  const [stakeholders, setStakeholders] = useState("");
+  const [positiveImpacts, setPositiveImpacts] = useState("");
+  const [negativeImpacts, setNegativeImpacts] = useState("");
+
   const onSave = (e) => {
     console.log(e);
 
     setFormStatus("Saving...");
-
-    // TODO fill out project info as other elements change
-    /*
+    
     let projectInfo = {
-      title: e.target.title.value,
-      description: e.target.description.value,
-      // TODO parse stakeholders into a list
-      stakeholders: e.target.stakeholders.value,
-      // TODO parse impacts into lists
-      positiveImpacts: e.target.positiveImpacts.value,
-      negativeImpacts: e.target.negativeImpacts.value,
+      title: title,
+      description: description,
+      // TODO parse stakeholders into a list?
+      stakeholders: stakeholders,
+      // TODO parse impacts into lists?
+      positiveImpacts: positiveImpacts,
+      negativeImpacts: negativeImpacts,
     };
-    console.log(projectInfo);*/
+    console.log(projectInfo);
 
     setFormStatus("Saved");
   };
-  const onBlur = (e) => {};
 
-  const onChange = (e) => {
+  const handleFormChange = (e) => {
     // TODO prevent closing page without saving
+    // TODO save differences to storage
     setFormStatus("Save");
   };
 
@@ -40,46 +45,46 @@ const ProjectDescription = () => {
           className="project-description-edit inplace-input"
           placeholder="Project Title"
           id="title"
-          onBlur={onBlur}
-          onChange={onChange}
+          onBlur={handleFormChange}
+          onChange={setTitle}
         />
-        <InputBlock
+        <InputAndChat
           inputtype="textarea"
           label="Description"
           id="description"
-          placeholderText="What does your project do? How do you imagine it being used?"
-          onBlur={onBlur}
-          onChange={onChange}
+          placeholderText="What does your project do?"
+          onBlur={handleFormChange}
+          onChange={(e) => {setDescription(e.target.value); handleFormChange();}}
         />
-        <InputBlock
+        <InputAndChat
           inputtype="textarea"
           label="Stakeholders"
           id="stakeholders"
           placeholderText="Which individuals, groups, or organizations might be impacted by your project?"
-          onBlur={onBlur}
-          onChange={onChange}
+          onBlur={handleFormChange}
+          onChange={setStakeholders}
         />
         <div className="description-block">
           <p className="mb-3 col-sm-12 project-sublabel">Potential Impacts</p>
 
           <div className="description-subblock col-lg-6">
-            <InputBlock
+            <InputAndChat
               inputtype="textarea"
               label="Positive"
               id="positiveImpacts"
               placeholderText="What are the potential benefits of your project?"
-              onBlur={onBlur}
-              onChange={onChange}
+              onBlur={handleFormChange}
+              onChange={setPositiveImpacts}
             />
           </div>
           <div className="description-subblock col-lg-6">
-            <InputBlock
+            <InputAndChat
               inputtype="textarea"
               label="Negative"
               id="negativeImpacts"
               placeholderText="What are the potentially harmful consequences of your project?"
-              onBlur={onBlur}
-              onChange={onChange}
+              onBlur={handleFormChange}
+              onChange={setNegativeImpacts}
             />
           </div>
         </div>

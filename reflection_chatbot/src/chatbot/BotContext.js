@@ -2,13 +2,13 @@ const Contexts = {
       Start: Symbol("start"),
       RequestSecretKey: Symbol("request api key"),
 
-      Help: Symbol("get help"),
+      Description: Symbol("descriptions"),
 
-      DesignJournal: Symbol("work on "),
+      Stakeholders: Symbol("stakeholders"),
 
-      ScratchChat: Symbol("talk about Scratch programming"),
+      PositiveImpacts: Symbol("positive impacts"),
 
-      JiboChat: Symbol("talk about jibo")
+      NegativeImpacts: Symbol("negative impacts"),
 }
 
 export default Contexts;
