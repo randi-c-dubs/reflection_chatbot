@@ -1,7 +1,8 @@
-import Contexts from "./BotContext";
+import Contexts from "./resources/BotContext";
 import GPT from "../gpt/GPTController";
 import Storage from "../user_util/StorageLog";
 import Accounts from "../user_util/Accounts";
+import KnowledgeBase from "./resources/KnowledgeBase";
 
 const rephraseHeader = "Rephrase the following in your own voice:";
 
@@ -63,7 +64,7 @@ class ActionProvider {
       this.handleStart();
     }
   };
-  handleRandomInput = async (userMsg) => {
+  handleRandomUserMessage = async (userMsg) => {
     let prompt = `userMsg`;
     let resp = await GPT.getGPTResponse(prompt);
     this.say(resp);
@@ -71,27 +72,116 @@ class ActionProvider {
 
   /**  AI Design Actions   **/
   handleMenuOption = async (userChoice) => {
-    console.log(userChoice);
+    switch (this.stateRef.context) {
+      case Contexts.Description:
+        this.handleDescription(userChoice);
+        break;
+      case Contexts.Stakeholders:
+        this.handleStakeholders(userChoice);
+        break;
+      case Contexts.NegativeImpacts:
+        this.handleNegativeImpacts(userChoice);
+        break;
+      case Contexts.PositiveImpacts:
+        this.handlePositiveImpacts(userChoice);
+        break;
+      default:
+        console.error("Ended up in an unknown state");
+        console.error(this.stateRef.context);
+        break;
+    }
   };
-  
+  handleDescription = async (userChoice) => {
+    // Remove the option from the menu
+    this.removeMenuOption(userChoice);
+
+    // Have chatbot say the content
+    let resp = KnowledgeBase["description"].content[userChoice];
+    if (Array.isArray(resp)) {
+      for (let i = 0; i < resp.length - 1; i++) {
+        this.say(resp[i]);
+      }
+      this.sayAndShowWidget(resp[resp.length - 1], {
+        widget: "dynamicOptionsMenu",
+      });
+    } else {
+      this.sayAndShowWidget(resp, { widget: "dynamicOptionsMenu" });
+    }
+
+    // TODO For some choices, add additional items to menu
+  };
+  handleStakeholders = async (userChoice) => {
+    // Remove the option from the menu
+    this.removeMenuOption(userChoice);
+
+    // Have chatbot say the content
+    let resp = KnowledgeBase["stakeholders"].content[userChoice];
+    if (Array.isArray(resp)) {
+      for (let i = 0; i < resp.length - 1; i++) {
+        this.say(resp[i]);
+      }
+      this.sayAndShowWidget(resp[resp.length - 1], {
+        widget: "dynamicOptionsMenu",
+      });
+    } else {
+      this.sayAndShowWidget(resp, { widget: "dynamicOptionsMenu" });
+    }
+
+    // TODO For some choices, add additional items to menu
+  };
+  handlePositiveImpacts = async (userChoice) => {
+    // Remove the option from the menu
+    this.removeMenuOption(userChoice);
+
+    // Have chatbot say the content
+    let resp = KnowledgeBase["positiveImpacts"].content[userChoice];
+    if (Array.isArray(resp)) {
+      for (let i = 0; i < resp.length - 1; i++) {
+        this.say(resp[i]);
+      }
+      this.sayAndShowWidget(resp[resp.length - 1], {
+        widget: "dynamicOptionsMenu",
+      });
+    } else {
+      this.sayAndShowWidget(resp, { widget: "dynamicOptionsMenu" });
+    }
+
+    // TODO For some choices, add additional items to menu
+  };
+  handleNegativeImpacts = async (userChoice) => {
+    // Remove the option from the menu
+    this.removeMenuOption(userChoice);
+
+    // Have chatbot say the content
+    let resp = KnowledgeBase["negativeImpacts"].content[userChoice];
+    if (Array.isArray(resp)) {
+      for (let i = 0; i < resp.length - 1; i++) {
+        this.say(resp[i]);
+      }
+      this.sayAndShowWidget(resp[resp.length - 1], {
+        widget: "dynamicOptionsMenu",
+      });
+    } else {
+      this.sayAndShowWidget(resp, { widget: "dynamicOptionsMenu" });
+    }
+
+    // TODO For some choices, add additional items to menu
+  };
+  handleBotInput = async (userMsg) => {};
 
   /**  Chatbot utility funcions **/
-  
-
-  say = (botMsg = "hello world") => {
-    this.sendBotMessage(this.createChatBotMessage(botMsg));
-  };
-
-  sayAndShowWidget = (botMsg = "hello world", widget) => {
-    this.sendBotMessage(this.createChatBotMessage(botMsg, widget));
-  };
-
   addMenuOptions = (newOptions) => {
     // add new options to existing options
     let menuOptions = this.stateRef.menuOptions.concat(newOptions);
     this.setMenuOptions(menuOptions);
   };
-
+  removeMenuOption = (option) => {
+    // remove options
+    let menuOptions = this.stateRef.menuOptions.filter((e) => {
+      return e.content !== option;
+    });
+    this.setMenuOptions(menuOptions);
+  };
   setMenuOptions = (options) => {
     // update menu options to tell widget what option buttons to display
     this.setState((prev) => ({
@@ -120,7 +210,6 @@ class ActionProvider {
       }));
     }
   };
-
   updateContextMessages = (userMsg) => {
     this.setState((prev) => ({
       ...prev,
@@ -128,6 +217,12 @@ class ActionProvider {
     }));
   };
 
+  say = (botMsg = "hello world") => {
+    this.sendBotMessage(this.createChatBotMessage(botMsg));
+  };
+  sayAndShowWidget = (botMsg = "hello world", widget) => {
+    this.sendBotMessage(this.createChatBotMessage(botMsg, widget));
+  };
   sendBotMessage = (botMsg) => {
     // Store timestamp, bot message, and context
     // TODO decide what to do about widgets
@@ -137,7 +232,6 @@ class ActionProvider {
       this.stateRef.context.description,
       botMsg.message
     );
-
     //console.log(this.stateRef); // debug message
 
     // post response to chat interface and add to contextMessages

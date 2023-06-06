@@ -6,15 +6,15 @@ const DynamicMenu = ({ menuOptions, actionProvider }) => {
   useEffect(() => {
     if (menuOptions) {
     const newOptions = menuOptions.map((op, idx) => ({
-      opText: op,
+      opText: op.text,
       opHandler: () => {
-        actionProvider.handleMenuOption(op);
+        actionProvider.handleMenuOption(op.content);
       },
       opId: idx,
     }));
     setOptions(newOptions);
   }
-  }, [menuOptions]);
+  }, []);
   return <GenericOptionsMenu options={options} />;
 };
 
