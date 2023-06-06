@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 
+import KnowledgeBase from "../../chatbot/resources/KnowledgeBase";
+
 import "./ProjectDescription.css";
 import InputAndChat from "./InputBlockWithChat";
 
@@ -13,10 +15,8 @@ const ProjectDescription = () => {
   const [negativeImpacts, setNegativeImpacts] = useState("");
 
   const onSave = (e) => {
-    console.log(e);
-
     setFormStatus("Saving...");
-    
+
     let projectInfo = {
       title: title,
       description: description,
@@ -45,46 +45,56 @@ const ProjectDescription = () => {
           className="project-description-edit inplace-input"
           placeholder="Project Title"
           id="title"
-          onBlur={handleFormChange}
-          onChange={setTitle}
+          onChange={(e) => {
+            setTitle(e.target.value);
+            handleFormChange();
+          }}
         />
         <InputAndChat
-          inputtype="textarea"
+          inputType="textarea"
           label="Description"
           id="description"
-          placeholderText="What does your project do?"
-          onBlur={handleFormChange}
-          onChange={(e) => {setDescription(e.target.value); handleFormChange();}}
+          placeholderText={ KnowledgeBase[`description`].inputPlaceHolder }
+          onChange={(e) => {
+            setDescription(e.target.value);
+            handleFormChange();
+          }}
         />
         <InputAndChat
-          inputtype="textarea"
+          inputType="textarea"
           label="Stakeholders"
           id="stakeholders"
-          placeholderText="Which individuals, groups, or organizations might be impacted by your project?"
-          onBlur={handleFormChange}
-          onChange={setStakeholders}
+          placeholderText={ KnowledgeBase[`stakeholders`].inputPlaceHolder }
+          onChange={(e) => {
+            setStakeholders(e.target.value);
+            handleFormChange();
+          }}
         />
         <div className="description-block">
           <p className="mb-3 col-sm-12 project-sublabel">Potential Impacts</p>
 
           <div className="description-subblock col-lg-6">
             <InputAndChat
-              inputtype="textarea"
+              inputType="textarea"
               label="Positive"
               id="positiveImpacts"
-              placeholderText="What are the potential benefits of your project?"
-              onBlur={handleFormChange}
-              onChange={setPositiveImpacts}
+              placeholderText={ KnowledgeBase[`positiveImpacts`].inputPlaceHolder }
+              onChange={(e) => {
+                setPositiveImpacts(e.target.value);
+                handleFormChange();
+              }}
             />
           </div>
           <div className="description-subblock col-lg-6">
             <InputAndChat
-              inputtype="textarea"
+              inputType="textarea"
               label="Negative"
               id="negativeImpacts"
-              placeholderText="What are the potentially harmful consequences of your project?"
-              onBlur={handleFormChange}
-              onChange={setNegativeImpacts}
+              placeholderText={ KnowledgeBase[`negativeImpacts`].inputPlaceHolder }
+              onChange={(e) => {
+                setNegativeImpacts(e.target.value);
+                handleFormChange();
+              }}
             />
           </div>
         </div>
@@ -92,7 +102,7 @@ const ProjectDescription = () => {
           className="btn btn-primary btn-large"
           size="lg"
           disabled={formStatus !== "Save"}
-          inputtype="submit"
+          type="submit"
           onClick={onSave}
         >
           {formStatus}
