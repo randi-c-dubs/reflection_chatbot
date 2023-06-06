@@ -1,28 +1,29 @@
-import React from "react";
+import React, { useMemo } from "react";
 import Spinner from "react-bootstrap/Spinner";
 
 import Chatbot from "react-chatbot-kit";
 import { createChatBotMessage } from "react-chatbot-kit";
 
+import debounce from "lodash.debounce";
+
 import ActionProvider from "../../chatbot/ActionProvider";
 import MessageParser from "../../chatbot/MessageParser";
 import config from "../../chatbot/config";
-import Contexts from "../../chatbot/BotContext";
+import Contexts from "../../chatbot/knowledge_base/BotContext";
 
 import "react-chatbot-kit/build/main.css";
 import "./InputBlockWithChat.css";
 
 const InputBlockWithChat = ({
-  inputtype,
+  inputType,
   label,
   id,
   placeholderText,
-  onBlur,
   onChange,
 }) => {
-  const [buttonStatus, setButtonStatus] = React.useState("visible"); // hidden / loading / visible
-  //const [messageRead, setMessageRead] = React.useState(true);
-  const [botVisible, setBotVisible] = React.useState(false);
+  const [buttonStatus, setButtonStatus] = React.useState("visible"); // loading / visible
+  const [chatStatus, setChatStatus] = React.useState("hidden"); // hidden / loading / visible
+  const [messageLog, setMessageLog] = React.useState("");
 
   let initialMsg, initialContext, initialMenu;
   // setup the chatbot with the appropriate initializations
@@ -35,17 +36,21 @@ const InputBlockWithChat = ({
     case "stakeholders":
       initialMsg = `Stakeholders are anyone that might be interested in your project and its outcomes.`;
       initialContext = Contexts.Stakeholders;
-      initialMenu = [`Tell me more`, `Show an example`,`List common stakeholders`];
+      initialMenu = [
+        `Tell me more`,
+        `Show an example`,
+        `List common stakeholders`,
+      ];
       break;
     case "positiveImpacts":
       initialMsg = `Positive impacts are ways that your project benefits your stakeholders.`;
       initialContext = Contexts.PositiveImpacts;
-      initialMenu = [`Tell me more`, `Show an example`,`List common benefits`];
+      initialMenu = [`Tell me more`, `Show an example`, `List common benefits`];
       break;
     case "negativeImpacts":
-      initialMsg = `Negative impacts are ways that your projects might (unintentionally!) harm your staekholders or put them at risk.`;
+      initialMsg = `Negative impacts are ways that your projects might (unintentionally!) harm your stakeholders or put them at risk.`;
       initialContext = Contexts.NegativeImpacts;
-      initialMenu = [`Tell me more`, `Show an example`,`List common risks`];
+      initialMenu = [`Tell me more`, `Show an example`, `List common risks`];
       break;
     default:
       console.error("Got an invalid id name");
@@ -58,31 +63,33 @@ const InputBlockWithChat = ({
   config.state.context = initialContext;
   config.state.menuOptions = initialMenu;
 
-  // TODO make this a debounced onchange instead
-  const onBlurHandle = (e) => {
-    // set visibility of button based on whether the item is filled or not
-    console.log("on blur handle");
-    console.log(e.target.id + ": " + e.target.value);
-
-    // make button visible
-    if (e.target.value) {
-      setButtonStatus("visible");
-
-      // TODO chatbot stuff
-    }
-
-    // call parent on blur to handle data
-    onBlur(e.target.id, e.target.value);
+  const saveMessageHandler = (messages, htmlText) => {
+    setMessageLog(htmlText);
   };
-  const onChangeHandle = (e) => {
-    setButtonStatus("loading");
+
+  const onChangeHandler = () => {
+    if (chatStatus === "hidden") setButtonStatus("loading");
+    else if (chatStatus === "visible") setChatStatus("loading");
+  };
+  const onInputValueEdited = (e) => {
+    // make chat and button visible
+    setButtonStatus("visible");
+    if (chatStatus === "loading") setChatStatus("visible");
+
+    // TODO do fancy chatbot stuff
 
     // call parent on change
     onChange(e);
   };
-  const botButtonHandler = () => {
-    // toggle visibillity of bot
-    setBotVisible(!botVisible);
+  const debouncedChangeHandler = useMemo(
+    () => debounce(onInputValueEdited, 300),
+    [chatStatus]
+  );
+
+  const onChatButtonClick = () => {
+    // change visibillity of bot
+    if (chatStatus === "hidden") setChatStatus("visible");
+    else setChatStatus("hidden");
   };
   const elementLostFocus = (e) => {
     // From https://muffinman.io/blog/catching-the-blur-event-on-an-element-and-its-children/
@@ -91,9 +98,8 @@ const InputBlockWithChat = ({
     // Give browser time to focus the next element
     requestAnimationFrame(() => {
       // Check if the new focused element is a child of the original container
-      if (!currentTarget.contains(document.activeElement)) {
-        setBotVisible(false);
-      }
+      if (!currentTarget.contains(document.activeElement))
+        setChatStatus("hidden");
     });
   };
   return (
@@ -111,8 +117,10 @@ const InputBlockWithChat = ({
               className="project-description-edit inplace-textarea"
               placeholder={placeholderText}
               id={id}
-              onBlur={onBlurHandle}
-              onChange={onChangeHandle}
+              onChange={(e) => {
+                onChangeHandler();
+                debouncedChangeHandler(e);
+              }}
             />
           ),
           input: (
@@ -120,11 +128,13 @@ const InputBlockWithChat = ({
               className="project-description-edit inplace-input"
               placeholder={placeholderText}
               id={id}
-              onBlur={onBlurHandle}
-              onChange={onChangeHandle}
+              onChange={(e) => {
+                onChangeHandler();
+                debouncedChangeHandler(e);
+              }}
             />
           ),
-        }[inputtype]
+        }[inputType]
       }
       {
         /* Chatbot open button */
@@ -133,7 +143,7 @@ const InputBlockWithChat = ({
             <button
               className="chatbot-btn btn btn-primary"
               type="button"
-              onClick={botButtonHandler}
+              onClick={onChatButtonClick}
             >
               <i className="bi bi-chat-right-dots-fill" />
             </button>
@@ -142,7 +152,7 @@ const InputBlockWithChat = ({
             <button
               className="chatbot-btn btn btn-primary"
               type="button"
-              onClick={botButtonHandler}
+              onClick={onChatButtonClick}
             >
               <Spinner animation="border" variant="light" size="sm" />
             </button>
@@ -151,13 +161,27 @@ const InputBlockWithChat = ({
       }
       {
         /* Chatbot component */
-        <div style={{ display: botVisible ? "block" : "none" }}>
-          <Chatbot
-            config={config}
-            actionProvider={ActionProvider}
-            messageParser={MessageParser}
-          />
-        </div>
+        chatStatus !== "hidden" && (
+          <div>
+            <Chatbot
+              className="chat"
+              config={config}
+              actionProvider={ActionProvider}
+              messageParser={MessageParser}
+              messageHistory={messageLog}
+              saveMessages={saveMessageHandler}
+            />
+            {chatStatus === "loading" && (
+              <div className="chat-overlay">
+                <Spinner
+                  className="chat-overlay-spinner"
+                  animation="border"
+                  variant="primary"
+                />
+              </div>
+            )}
+          </div>
+        )
       }
     </div>
   );
