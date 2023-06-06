@@ -1,5 +1,5 @@
 //import GPT from "../gpt/GPTController";
-import Contexts from "./BotContext";
+import Contexts from "./resources/BotContext";
 import Storage from "../user_util/StorageLog";
 
 // The MessageParse class analyzes words sent to the chatbot and calls the appropriate ActionProvider function
@@ -49,7 +49,7 @@ class MessageParser {
        * Call the appropriate actionProvider function here
        */
       console.log(`Ended up in message parser else ${userMsg}`); // for testing message parser
-      this.actionProvider.handleRandomInput(userMsg);
+      this.actionProvider.handleRandomUserMessage(userMsg);
     }
   }
 }
