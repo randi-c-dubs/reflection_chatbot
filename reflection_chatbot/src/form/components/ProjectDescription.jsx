@@ -54,7 +54,7 @@ const ProjectDescription = () => {
           inputType="textarea"
           label="Description"
           id="description"
-          placeholderText={ KnowledgeBase[`description`].inputPlaceHolder }
+          placeholderText={ KnowledgeBase[`description`].inputPlaceholder }
           onChange={(e) => {
             setDescription(e.target.value);
             handleFormChange();
@@ -64,7 +64,7 @@ const ProjectDescription = () => {
           inputType="textarea"
           label="Stakeholders"
           id="stakeholders"
-          placeholderText={ KnowledgeBase[`stakeholders`].inputPlaceHolder }
+          placeholderText={ KnowledgeBase[`stakeholders`].inputPlaceholder }
           onChange={(e) => {
             setStakeholders(e.target.value);
             handleFormChange();
@@ -78,7 +78,7 @@ const ProjectDescription = () => {
               inputType="textarea"
               label="Positive"
               id="positiveImpacts"
-              placeholderText={ KnowledgeBase[`positiveImpacts`].inputPlaceHolder }
+              placeholderText={ KnowledgeBase[`positiveImpacts`].inputPlaceholder }
               onChange={(e) => {
                 setPositiveImpacts(e.target.value);
                 handleFormChange();
@@ -90,7 +90,7 @@ const ProjectDescription = () => {
               inputType="textarea"
               label="Negative"
               id="negativeImpacts"
-              placeholderText={ KnowledgeBase[`negativeImpacts`].inputPlaceHolder }
+              placeholderText={ KnowledgeBase[`negativeImpacts`].inputPlaceholder }
               onChange={(e) => {
                 setNegativeImpacts(e.target.value);
                 handleFormChange();

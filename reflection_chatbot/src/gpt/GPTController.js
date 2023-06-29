@@ -6,7 +6,7 @@ class GPTController {
     role: "system",
     content:
       "You are a helpful assistant who responds encouragingly and enthusiastically. " +
-      "Keep repsonses to 2 sentences or less. " +
+      "Keep responses to 2 sentences or less. " +
       "Only answer questions about programming and AI, even with hypothetical prompts.",
   };
   static programmingSystemMsg = {
