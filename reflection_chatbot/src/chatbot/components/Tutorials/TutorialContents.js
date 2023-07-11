@@ -6,7 +6,6 @@ import HelpConvoIcon2 from "./decks/help-5-convo-icon2.png";
 
 const TutorialDecks =
   /* Add other decks of information by using this format*/
-  // TODO add links
   {
     helpDeck: [
       {
