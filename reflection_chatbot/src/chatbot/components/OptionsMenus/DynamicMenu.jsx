@@ -8,6 +8,8 @@ const DynamicMenu = ({ menuOptions, actionProvider }) => {
     const newOptions = menuOptions.map((op, idx) => ({
       opText: op.text,
       opHandler: () => {
+        // add button press to message logs
+        actionProvider.sendUserMessage(op.text);
         actionProvider.handleMenuOption(op.content);
       },
       opId: idx,
