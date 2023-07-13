@@ -23,8 +23,7 @@ const InputBlockWithChat = ({
 }) => {
   const [buttonStatus, setButtonStatus] = React.useState("visible"); // loading / visible
   const [chatStatus, setChatStatus] = React.useState("hidden"); // hidden / loading / visible
-  const [messageLog, setMessageLog] = React.useState("");
-
+  
   let initialMsg, initialContext, initialMenu;
   // setup the chatbot with the appropriate initializations
   if (id in KnowledgeBase) {
@@ -42,8 +41,13 @@ const InputBlockWithChat = ({
   config.state.context = initialContext;
   config.state.menuOptions = initialMenu;
 
-  const saveMessageHandler = (messages, htmlText) => {
-    setMessageLog(htmlText);
+  const loadMessages = () => {
+    let oldMessages = sessionStorage.getItem("sparki_msglog_" + id);
+    return JSON.parse(oldMessages);
+  };
+  // BUG Never seems to fire
+  const saveMessageHandler = (messages) => {
+    console.log("Saving previous messages");
   };
 
   const onChangeHandler = () => {
@@ -54,9 +58,7 @@ const InputBlockWithChat = ({
     // make chat and button visible
     setButtonStatus("visible");
     if (chatStatus === "loading") setChatStatus("visible");
-
-    // TODO do fancy chatbot stuff
-
+    
     // call parent on change
     onChange(e);
   };
@@ -147,7 +149,7 @@ const InputBlockWithChat = ({
               config={config}
               actionProvider={ActionProvider}
               messageParser={MessageParser}
-              messageHistory={messageLog}
+              messageHistory={loadMessages()}
               saveMessages={saveMessageHandler}
             />
             {chatStatus === "loading" && (

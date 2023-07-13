@@ -14,6 +14,9 @@ function App() {
   const [apiKey, setApiKey] = useState(Accounts.getSecretKey());
 
   useEffect(() => {
+    // clear session storage at start
+    sessionStorage.clear();
+
     window.addEventListener("beforeunload", endSession);
 
     return () => {
