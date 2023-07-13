@@ -20,7 +20,7 @@ const KnowledgeBase = {
         `This project will help school counselors give their students access to advice and resources to better navigate issues in school and to plan their future careers.`
       ],
       ideas: [
-        `Some common problems that AI chatbots can help in school is by supporting teachers, school staff, or school counselors in managing students.`,
+        `Some problems that AI chatbots can address in schools are supporting teachers, school staff, or school counselors in working with students.`,
         `They could also work with students directly to give them personalized support that helps them be successful.`,
         `Usually these chatbots focus on one specific area, like career advice or a particular school subject.`
       ],
