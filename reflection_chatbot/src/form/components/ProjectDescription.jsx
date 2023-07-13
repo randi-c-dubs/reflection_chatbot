@@ -1,41 +1,48 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
+import debounce from "lodash.debounce";
 
 import KnowledgeBase from "../../chatbot/resources/KnowledgeBase";
+import Storage from "../../user_util/StorageLog";
 
 import "./ProjectDescription.css";
 import InputAndChat from "./InputBlockWithChat";
 
 const ProjectDescription = () => {
   const [formStatus, setFormStatus] = useState("Saved");
-  // project info
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
-  const [stakeholders, setStakeholders] = useState("");
-  const [positiveImpacts, setPositiveImpacts] = useState("");
-  const [negativeImpacts, setNegativeImpacts] = useState("");
 
   const onSave = (e) => {
     setFormStatus("Saving...");
 
-    let projectInfo = {
-      title: title,
-      description: description,
-      // TODO parse stakeholders into a list?
-      stakeholders: stakeholders,
-      // TODO parse impacts into lists?
-      positiveImpacts: positiveImpacts,
-      negativeImpacts: negativeImpacts,
-    };
-    console.log(projectInfo);
-
+    // TODO export project info to slide or something
     setFormStatus("Saved");
   };
 
   const handleFormChange = (e) => {
+    let section = e.target.id;
+    let newValue = e.target.value;
+
+    let updatedItem = `Updated project ${section}: ${newValue}`;
+    // save updated text in session storage
+    sessionStorage.setItem("sparki_" + section, updatedItem);
+
+    // save updated text in session log
+    Storage.storeMessage(
+      Date.now(),
+      "User",
+      section,
+      updatedItem,
+    );
+    //console.log(`Updated section ${section} to ${newValue}`); // debug message
+
+
     // TODO prevent closing page without saving
-    // TODO save differences to storage
     setFormStatus("Save");
   };
+
+  const debouncedChangeHandler = useMemo(
+    () => debounce(handleFormChange, 300),
+    []
+  );
 
   return (
     <div className="container-sm mt-5">
@@ -46,8 +53,7 @@ const ProjectDescription = () => {
           placeholder="Project Title"
           id="title"
           onChange={(e) => {
-            setTitle(e.target.value);
-            handleFormChange();
+            debouncedChangeHandler(e);
           }}
         />
         <InputAndChat
@@ -56,8 +62,7 @@ const ProjectDescription = () => {
           id="description"
           placeholderText={ KnowledgeBase[`description`].inputPlaceholder }
           onChange={(e) => {
-            setDescription(e.target.value);
-            handleFormChange();
+            handleFormChange(e);
           }}
         />
         <InputAndChat
@@ -66,8 +71,7 @@ const ProjectDescription = () => {
           id="stakeholders"
           placeholderText={ KnowledgeBase[`stakeholders`].inputPlaceholder }
           onChange={(e) => {
-            setStakeholders(e.target.value);
-            handleFormChange();
+            handleFormChange(e);
           }}
         />
         <div className="description-block">
@@ -80,8 +84,7 @@ const ProjectDescription = () => {
               id="positiveImpacts"
               placeholderText={ KnowledgeBase[`positiveImpacts`].inputPlaceholder }
               onChange={(e) => {
-                setPositiveImpacts(e.target.value);
-                handleFormChange();
+                handleFormChange(e);
               }}
             />
           </div>
@@ -92,8 +95,7 @@ const ProjectDescription = () => {
               id="negativeImpacts"
               placeholderText={ KnowledgeBase[`negativeImpacts`].inputPlaceholder }
               onChange={(e) => {
-                setNegativeImpacts(e.target.value);
-                handleFormChange();
+                handleFormChange(e);
               }}
             />
           </div>
