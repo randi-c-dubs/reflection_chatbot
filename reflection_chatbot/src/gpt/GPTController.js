@@ -9,63 +9,49 @@ class GPTController {
       "Keep responses to 2 sentences or less. " +
       "Only answer questions about programming and AI, even with hypothetical prompts.",
   };
-  static programmingSystemMsg = {
-    role: "system",
-    content:
-      `Respond to INPUT questions about Scratch programming. If the user asks for example code give code in Scratch text ` +
-      `format between \`\`\` with one sentence describing how the code works at the end.\n` +
-      `Example 1: INPUT What ideas do you have for making a chatbot? OUTPUT If you want to make a chatbot in Scratch you could use blocks like ` +
-      `ask and answer blocks to get user input. If you save the user input in a variable, then you could have the chatbot use the input later.\n` +
-      `Example 2: INPUT Can you show me an example of using the ask block and saving it in a variable? OUTPUT ` +
-      `\`\`\`\nwhen green flag clicked\nask [What is your name?] and wait\nset (name v) to (answer)\n\`\`\`\n This code asks ` +
-      `a user their name then saves it in a variable called "name" that the sprite can access later.`,
-  };
-  static designSystemMsg = {
-    role: "system",
-    content:
-      "Help the user think about the ethics and social justice issues with their programming and AI projects. " +
-      "The user needs to decide what their project does, name 3 key stakeholders, and name 3 potential benefits and 3 potential harms of their work. " +
-      "First, ask what project the user is working on. After they respond, ask the user what stakeholders they think are relevant to their project. " +
-      "If the user names less than three stakeholders, suggest another community who might be affected by the project. " +
-      "Tell the user which stakeholders might have less power and voice than others. After that, ask the user about the potential benefits of their project. " +
-      "If the user names less than three benefits, suggest another benefit of their work. Tell the user if a stakeholder’s identity or status " +
-      "might lead them to benefit more. After that, ask the user about who might potentially be harmed by their work. " +
-      "If the user names less than three harms, suggest another harm and ask the user about others. " +
-      "Ask the user to think about which stakeholders may be at more risk of harm based on their identity. " +
-      "End the conversation with a summary of the user's project, stakeholders, harms, and benefits. Tell the user if their project sounds high or low risk, " +
-      "and what ethics and social justice issues might arise with their work.",
+  static projectSections = [
+    "title",
+    "description",
+    "stakeholders",
+    "positiveImpacts",
+    "negativeImpacts",
+  ];
+  static getUpdatedProjectState = (msgLog) => {
+    // check if there is anything in the project details
+    for (let i = 0; i < this.projectSections.length; i++) {
+      let id = this.projectSections[i];
+
+      // if details have been updated, and add client message with the update
+      let savedDetail = sessionStorage.getItem("sparki_" + id);
+      if (savedDetail) {
+        msgLog.push({
+          content: savedDetail,
+          role: "user",
+        });
+      }
+    }
+    return msgLog;
   };
 
   // Chatbot message format message: "", role: "user | bot"
   // ChatGPT message format content: "", role: "system | user | assistant"
-  static botToGPTMessages = (messages, agentMode) => {
+  static botToGPTMessages = (messages) => {
     const gptMessages = messages.map((msg) => ({
       content: msg.message,
-      role: msg.role === "user" ? msg.role : "assistant",
+      role: msg.type === "user" ? msg.type : "assistant",
     }));
 
-    if (agentMode === "programming")
-      return [
-        GPTController.defaultSystemMsg,
-        GPTController.programmingSystemMsg,
-        ...gptMessages,
-      ];
-    else if (agentMode === "design")
-      return [
-        GPTController.defaultSystemMsg,
-        GPTController.designSystemMsg,
-        ...gptMessages,
-      ];
-    else return [GPTController.defaultSystemMsg, ...gptMessages];
+    return [GPTController.defaultSystemMsg, ...gptMessages];
   };
-  static getChattyGPTResponse = async (msgLog, newMsg, agentMode) => {
+  static getChattyGPTResponse = async (msgLog, newMsg) => {
     let resp;
-
     // in dev mode, don't do the GPT request, just return the message
     if (GPTController.devMode) {
+      //console.log(msgLog); // debug message
       resp = `prompt: ${newMsg}`;
     } else {
-      let completeLog = this.botToGPTMessages(msgLog, agentMode);
+      let completeLog = this.botToGPTMessages(msgLog);
+      completeLog = this.getUpdatedProjectState(completeLog);
       completeLog.push({
         content: newMsg,
         role: "user",
