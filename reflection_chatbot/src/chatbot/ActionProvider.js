@@ -26,14 +26,12 @@ class ActionProvider {
   }
 
   handleStart = async () => {
-    this.updateContext(Contexts.Start);
     let prompt = `${rephraseHeader} "What would you like to do? I can help with a few specific things."`;
     let resp = await GPT.getGPTResponse(prompt);
     this.sayAndShowWidget(resp, { widget: "startMenu" });
   };
 
   requestSecretKey = async () => {
-    this.updateContext(Contexts.RequestSecretKey);
     this.say(
       `Please enter a valid secret key or OpenAI API key to use Sparki.`
     );
@@ -64,26 +62,29 @@ class ActionProvider {
       this.handleStart();
     }
   };
-  handleRandomUserMessage = async (userMsg) => {
-    let prompt = `userMsg`;
-    let resp = await GPT.getGPTResponse(prompt);
+  handleUserMessage = async (userMsg) => {
+    let resp = await GPT.getChattyGPTResponse(
+      this.stateRef.messages,
+      userMsg,
+    );
     this.say(resp);
   };
 
   /**  AI Design Actions   **/
   handleMenuOption = async (userChoice) => {
+    // handle button press appropriately
     switch (this.stateRef.context) {
       case Contexts.Description:
-        this.handleDescription(userChoice);
+        this.displayFromKnowledgeBase("description", userChoice);
         break;
       case Contexts.Stakeholders:
-        this.handleStakeholders(userChoice);
+        this.displayFromKnowledgeBase("stakeholders", userChoice);
         break;
       case Contexts.NegativeImpacts:
-        this.handleNegativeImpacts(userChoice);
+        this.displayFromKnowledgeBase("negativeImpacts", userChoice);
         break;
       case Contexts.PositiveImpacts:
-        this.handlePositiveImpacts(userChoice);
+        this.displayFromKnowledgeBase("positiveImpacts", userChoice);
         break;
       default:
         console.error("Ended up in an unknown state");
@@ -91,83 +92,26 @@ class ActionProvider {
         break;
     }
   };
-  handleDescription = async (userChoice) => {
+  displayFromKnowledgeBase = async (category, userChoice) => {
     // Remove the option from the menu
     this.removeMenuOption(userChoice);
 
     // Have chatbot say the content
-    let resp = KnowledgeBase["description"].content[userChoice];
+    let resp = KnowledgeBase[category].content[userChoice];
+
     if (Array.isArray(resp)) {
       for (let i = 0; i < resp.length - 1; i++) {
         this.say(resp[i]);
-      }
+      }    
+      // TODO For some choices, add additional items to options menu
       this.sayAndShowWidget(resp[resp.length - 1], {
         widget: "dynamicOptionsMenu",
       });
     } else {
+    // TODO For some choices, add additional items to options menu
       this.sayAndShowWidget(resp, { widget: "dynamicOptionsMenu" });
     }
-
-    // TODO For some choices, add additional items to menu
   };
-  handleStakeholders = async (userChoice) => {
-    // Remove the option from the menu
-    this.removeMenuOption(userChoice);
-
-    // Have chatbot say the content
-    let resp = KnowledgeBase["stakeholders"].content[userChoice];
-    if (Array.isArray(resp)) {
-      for (let i = 0; i < resp.length - 1; i++) {
-        this.say(resp[i]);
-      }
-      this.sayAndShowWidget(resp[resp.length - 1], {
-        widget: "dynamicOptionsMenu",
-      });
-    } else {
-      this.sayAndShowWidget(resp, { widget: "dynamicOptionsMenu" });
-    }
-
-    // TODO For some choices, add additional items to menu
-  };
-  handlePositiveImpacts = async (userChoice) => {
-    // Remove the option from the menu
-    this.removeMenuOption(userChoice);
-
-    // Have chatbot say the content
-    let resp = KnowledgeBase["positiveImpacts"].content[userChoice];
-    if (Array.isArray(resp)) {
-      for (let i = 0; i < resp.length - 1; i++) {
-        this.say(resp[i]);
-      }
-      this.sayAndShowWidget(resp[resp.length - 1], {
-        widget: "dynamicOptionsMenu",
-      });
-    } else {
-      this.sayAndShowWidget(resp, { widget: "dynamicOptionsMenu" });
-    }
-
-    // TODO For some choices, add additional items to menu
-  };
-  handleNegativeImpacts = async (userChoice) => {
-    // Remove the option from the menu
-    this.removeMenuOption(userChoice);
-
-    // Have chatbot say the content
-    let resp = KnowledgeBase["negativeImpacts"].content[userChoice];
-    if (Array.isArray(resp)) {
-      for (let i = 0; i < resp.length - 1; i++) {
-        this.say(resp[i]);
-      }
-      this.sayAndShowWidget(resp[resp.length - 1], {
-        widget: "dynamicOptionsMenu",
-      });
-    } else {
-      this.sayAndShowWidget(resp, { widget: "dynamicOptionsMenu" });
-    }
-
-    // TODO For some choices, add additional items to menu
-  };
-  handleBotInput = async (userMsg) => {};
 
   /**  Chatbot utility funcions **/
   addMenuOptions = (newOptions) => {
@@ -198,47 +142,54 @@ class ActionProvider {
     }));
   };
 
-  updateContext = (newContext) => {
-    if (this.stateRef.context !== newContext) {
-      console.log(`Changing context to ${newContext.description}`); // debug message
-
-      // Change the context of the chat and reset contextMessages
-      this.setState((prev) => ({
-        ...prev,
-        context: newContext,
-        contextMessages: [],
-      }));
-    }
-  };
-  updateContextMessages = (userMsg) => {
-    this.setState((prev) => ({
-      ...prev,
-      contextMessages: [...prev.contextMessages, userMsg],
-    }));
-  };
-
   say = (botMsg = "hello world") => {
     this.sendBotMessage(this.createChatBotMessage(botMsg));
   };
   sayAndShowWidget = (botMsg = "hello world", widget) => {
     this.sendBotMessage(this.createChatBotMessage(botMsg, widget));
   };
+  sendUserMessage = (messageText) => {
+    let id = this.stateRef.context.description;
+    let userMsg = this.createClientMessage(messageText);
+    // Store timestamp, user message, and context
+    // TODO decide what to do about widgets
+    Storage.storeMessage(
+      Date.now(),
+      "User",
+      id,
+      messageText
+    );
+    sessionStorage.setItem(
+      "sparki_msglog_" + id,
+      JSON.stringify([...this.stateRef.messages, userMsg])
+    );
+
+    // post to chat log
+    this.setState((prev) => ({
+      ...prev,
+      messages: [...prev.messages, userMsg],
+    }));
+  }
   sendBotMessage = (botMsg) => {
+    let id = this.stateRef.context.description;
     // Store timestamp, bot message, and context
     // TODO decide what to do about widgets
     Storage.storeMessage(
       Date.now(),
       "Sparki",
-      this.stateRef.context.description,
+      id,
       botMsg.message
+    );
+    sessionStorage.setItem(
+      "sparki_msglog_" + id,
+      JSON.stringify([...this.stateRef.messages, botMsg])
     );
     //console.log(this.stateRef); // debug message
 
-    // post response to chat interface and add to contextMessages
+    // post response to chat interface
     this.setState((prev) => ({
       ...prev,
       messages: [...prev.messages, botMsg],
-      contextMessages: [...prev.contextMessages, botMsg],
     }));
   };
 }
