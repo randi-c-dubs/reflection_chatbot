@@ -28,28 +28,13 @@ class MessageParser {
     else if (context === Contexts.RequestSecretKey) {
       this.actionProvider.requestSecretKey();
     }
-    // for chat input about project description
-    else if (context === Contexts.Description) {
-
-    }
-    // for chat input about stakeholders
-    else if (context === Contexts.Stakeholders) {
-
-    }
-    // for chat input about positive impacts
-    else if (context === Contexts.PositiveImpacts) {
-
-    }
-    // for chat input about negative impacts
-    else if (context === Contexts.NegativeImpacts) {
-
-    }
+    // TODO check for user typing text that button says
     else {
       /** Parse the user input by adding to this else-if list.
        * Call the appropriate actionProvider function here
        */
-      console.log(`Ended up in message parser else ${userMsg}`); // for testing message parser
-      this.actionProvider.handleRandomUserMessage(userMsg);
+      //console.log(`Ended up in message parser else ${userMsg}`); // for testing message parser
+      await this.actionProvider.handleUserMessage(userMsg);
     }
   }
 }

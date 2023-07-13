@@ -8,9 +8,7 @@ const botName = "Sparki";
 
 const config = {
   botName: botName,
-  state: {
-    contextMessages: [],
-  },
+  state: {},
   widgets: [
     // TODO important cards for stakeholders, benefits, risks, etc.
     {
